@@ -1,0 +1,87 @@
+{
+  "code": "BGD",
+  "name": "Bangladesh",
+  "region": "South Asia",
+  "context": "mixed_formal_informal",
+  "language": "en",
+  "language_alt": "bn",
+  "currency": "BDT",
+  "currency_symbol": "৳",
+  "currency_to_usd": 110,
+  "ilo_source_indicators": {
+    "unemployment": "SDG_0852_SEX_AGE_RT",
+    "informal_employment": "SDG_0831_SEX_ECO_RT",
+    "working_poverty": "SDG_0111_SEX_AGE_RT",
+    "avg_earnings": "SDG_0851_SEX_OCU_NB",
+    "gdp_per_worker": "SDG_0821_ECO_GR"
+  },
+  "signals": {
+    "informal_employment_pct": 85.1,
+    "youth_unemployment_pct": 15.7,
+    "working_poverty_rate": 24.6,
+    "avg_monthly_wage_usd": 180,
+    "gdp_growth_pct": 6.4,
+    "population_millions": 170.0,
+    "data_year": 2023,
+    "data_source": "ILO ILOSTAT, World Bank WDI 2023"
+  },
+  "sectors": [
+    {
+      "name": "Agriculture",
+      "employment_pct": 38.6,
+      "growth_rate_pct": 2.8,
+      "avg_wage_usd": 90,
+      "opportunity_types": ["self_employment", "seasonal_wage", "cooperative"],
+      "informal_dominant": true
+    },
+    {
+      "name": "Garments & Textile (RMG)",
+      "employment_pct": 14.2,
+      "growth_rate_pct": 3.5,
+      "avg_wage_usd": 155,
+      "opportunity_types": ["formal_employment", "piece_rate"],
+      "informal_dominant": false
+    },
+    {
+      "name": "Wholesale & Retail Trade",
+      "employment_pct": 15.3,
+      "growth_rate_pct": 4.2,
+      "avg_wage_usd": 140,
+      "opportunity_types": ["self_employment", "informal_wage"],
+      "informal_dominant": true
+    },
+    {
+      "name": "Construction",
+      "employment_pct": 5.8,
+      "growth_rate_pct": 6.1,
+      "avg_wage_usd": 160,
+      "opportunity_types": ["informal_wage", "piece_rate"],
+      "informal_dominant": true
+    },
+    {
+      "name": "Transport & Storage",
+      "employment_pct": 4.6,
+      "growth_rate_pct": 5.3,
+      "avg_wage_usd": 150,
+      "opportunity_types": ["self_employment", "gig"],
+      "informal_dominant": true
+    },
+    {
+      "name": "ICT & Digital Services",
+      "employment_pct": 1.2,
+      "growth_rate_pct": 15.1,
+      "avg_wage_usd": 320,
+      "opportunity_types": ["formal_employment", "freelance", "gig"],
+      "informal_dominant": false
+    }
+  ],
+  "opportunity_types_available": ["formal_employment", "self_employment", "gig", "training", "piece_rate", "cooperative"],
+  "automation_risk_note": "RMG sector faces medium-term automation risk from robotic sewing. Digital skills and services are growing fastest. Agriculture modernization creates new skill demand.",
+  "local_realities": [
+    "RMG employs ~4M workers, 80% women — transitional skills are critical",
+    "Mobile banking (bKash) enables micro-entrepreneurship",
+    "Rural-urban migration creates demand for construction + service skills",
+    "Remittance economy: overseas work (Middle East, Malaysia) is a major pathway",
+    "TVET (Technical Education) is underutilised but expanding"
+  ]
+}

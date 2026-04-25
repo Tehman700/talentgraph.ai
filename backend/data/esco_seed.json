@@ -1,0 +1,234 @@
+{
+  "version": "1.2",
+  "source": "ESCO v1.2 — https://esco.ec.europa.eu — curated subset for LMIC contexts",
+  "occupations": [
+    {
+      "isco_code": "6111",
+      "title": "Crop Farmer",
+      "description": "Grows crops for food, feed, fibre and fuel on own or rented land",
+      "skills": [
+        {"label": "crop cultivation techniques", "reusability": "sector-specific", "is_durable": true},
+        {"label": "irrigation management", "reusability": "sector-specific", "is_durable": true},
+        {"label": "pest and disease identification", "reusability": "cross-sector", "is_durable": true},
+        {"label": "harvest planning", "reusability": "sector-specific", "is_durable": false},
+        {"label": "soil assessment", "reusability": "sector-specific", "is_durable": true}
+      ],
+      "durable_skills": ["seasonal planning", "weather pattern reading", "resource management"],
+      "relevant_countries": ["UGA", "BGD"],
+      "opportunity_types": ["self_employment", "cooperative", "seasonal_wage"],
+      "informal_friendly": true
+    },
+    {
+      "isco_code": "6121",
+      "title": "Livestock Farmer",
+      "description": "Raises and tends animals for meat, milk, wool, or other products",
+      "skills": [
+        {"label": "animal husbandry", "reusability": "sector-specific", "is_durable": true},
+        {"label": "veterinary first aid", "reusability": "cross-sector", "is_durable": true},
+        {"label": "feed management", "reusability": "sector-specific", "is_durable": false},
+        {"label": "animal health monitoring", "reusability": "cross-sector", "is_durable": true}
+      ],
+      "durable_skills": ["caretaking", "observation and monitoring", "resource scheduling"],
+      "relevant_countries": ["UGA"],
+      "opportunity_types": ["self_employment", "cooperative"],
+      "informal_friendly": true
+    },
+    {
+      "isco_code": "7433",
+      "title": "Textile Sewing Machine Operator",
+      "description": "Operates sewing machines to join fabric pieces and produce garments",
+      "skills": [
+        {"label": "sewing machine operation", "reusability": "sector-specific", "is_durable": false},
+        {"label": "fabric cutting and measuring", "reusability": "sector-specific", "is_durable": false},
+        {"label": "quality inspection", "reusability": "cross-sector", "is_durable": true},
+        {"label": "pattern reading", "reusability": "sector-specific", "is_durable": false},
+        {"label": "production pace management", "reusability": "cross-sector", "is_durable": true}
+      ],
+      "durable_skills": ["attention to detail", "manual dexterity", "quality control"],
+      "relevant_countries": ["BGD"],
+      "opportunity_types": ["formal_employment", "piece_rate"],
+      "informal_friendly": false
+    },
+    {
+      "isco_code": "9313",
+      "title": "Building Construction Labourer",
+      "description": "Performs manual tasks in construction of buildings and infrastructure",
+      "skills": [
+        {"label": "manual construction tasks", "reusability": "sector-specific", "is_durable": false},
+        {"label": "basic tool operation", "reusability": "cross-sector", "is_durable": true},
+        {"label": "safety procedures compliance", "reusability": "cross-sector", "is_durable": true},
+        {"label": "material handling", "reusability": "cross-sector", "is_durable": true}
+      ],
+      "durable_skills": ["physical stamina", "teamwork", "following instructions"],
+      "relevant_countries": ["UGA", "BGD"],
+      "opportunity_types": ["informal_wage", "piece_rate"],
+      "informal_friendly": true
+    },
+    {
+      "isco_code": "7112",
+      "title": "Mason / Bricklayer",
+      "description": "Builds and repairs walls, floors and other structures using bricks and mortar",
+      "skills": [
+        {"label": "bricklaying and masonry", "reusability": "sector-specific", "is_durable": false},
+        {"label": "blueprint and plan reading", "reusability": "cross-sector", "is_durable": true},
+        {"label": "mortar mixing", "reusability": "sector-specific", "is_durable": false},
+        {"label": "structural measurement", "reusability": "cross-sector", "is_durable": true}
+      ],
+      "durable_skills": ["precision", "spatial reasoning", "problem-solving"],
+      "relevant_countries": ["UGA", "BGD"],
+      "opportunity_types": ["informal_wage", "self_employment"],
+      "informal_friendly": true
+    },
+    {
+      "isco_code": "9111",
+      "title": "Domestic Cleaner / Helper",
+      "description": "Cleans and maintains private households and performs household tasks",
+      "skills": [
+        {"label": "household cleaning and maintenance", "reusability": "sector-specific", "is_durable": false},
+        {"label": "cooking and food preparation", "reusability": "cross-sector", "is_durable": true},
+        {"label": "childcare basics", "reusability": "cross-sector", "is_durable": true},
+        {"label": "time management", "reusability": "cross-sector", "is_durable": true}
+      ],
+      "durable_skills": ["reliability", "discretion", "interpersonal communication"],
+      "relevant_countries": ["UGA", "BGD"],
+      "opportunity_types": ["informal_wage", "self_employment"],
+      "informal_friendly": true
+    },
+    {
+      "isco_code": "5221",
+      "title": "Market Stall / Street Vendor",
+      "description": "Sells goods and products from a stall or on the street",
+      "skills": [
+        {"label": "customer service", "reusability": "cross-sector", "is_durable": true},
+        {"label": "inventory management", "reusability": "cross-sector", "is_durable": true},
+        {"label": "cash handling and basic accounting", "reusability": "cross-sector", "is_durable": true},
+        {"label": "negotiation", "reusability": "cross-sector", "is_durable": true},
+        {"label": "product display and merchandising", "reusability": "cross-sector", "is_durable": true}
+      ],
+      "durable_skills": ["entrepreneurship", "financial literacy", "communication"],
+      "relevant_countries": ["UGA", "BGD"],
+      "opportunity_types": ["self_employment"],
+      "informal_friendly": true
+    },
+    {
+      "isco_code": "3253",
+      "title": "Community Health Worker",
+      "description": "Delivers basic health services and health education in communities",
+      "skills": [
+        {"label": "health education delivery", "reusability": "cross-sector", "is_durable": true},
+        {"label": "basic first aid", "reusability": "cross-sector", "is_durable": true},
+        {"label": "community outreach", "reusability": "cross-sector", "is_durable": true},
+        {"label": "patient record keeping", "reusability": "cross-sector", "is_durable": true}
+      ],
+      "durable_skills": ["empathy", "communication", "community trust-building"],
+      "relevant_countries": ["UGA", "BGD"],
+      "opportunity_types": ["formal_employment", "ngo_employment", "volunteer"],
+      "informal_friendly": false
+    },
+    {
+      "isco_code": "7422",
+      "title": "Electronics Repair Technician",
+      "description": "Repairs and maintains consumer electronics and mobile phones",
+      "skills": [
+        {"label": "electronic component diagnosis", "reusability": "sector-specific", "is_durable": true},
+        {"label": "soldering and circuit repair", "reusability": "sector-specific", "is_durable": false},
+        {"label": "mobile phone repair", "reusability": "sector-specific", "is_durable": false},
+        {"label": "customer diagnosis communication", "reusability": "cross-sector", "is_durable": true}
+      ],
+      "durable_skills": ["problem diagnosis", "precision", "continuous learning"],
+      "relevant_countries": ["UGA", "BGD"],
+      "opportunity_types": ["self_employment", "informal_wage"],
+      "informal_friendly": true
+    },
+    {
+      "isco_code": "8322",
+      "title": "Motorcycle Taxi Driver",
+      "description": "Transports passengers on motorcycle for payment",
+      "skills": [
+        {"label": "safe motorcycle operation", "reusability": "sector-specific", "is_durable": false},
+        {"label": "route navigation", "reusability": "cross-sector", "is_durable": true},
+        {"label": "customer communication", "reusability": "cross-sector", "is_durable": true},
+        {"label": "basic vehicle maintenance", "reusability": "cross-sector", "is_durable": true}
+      ],
+      "durable_skills": ["reliability", "local area knowledge", "interpersonal communication"],
+      "relevant_countries": ["UGA"],
+      "opportunity_types": ["self_employment", "gig"],
+      "informal_friendly": true
+    },
+    {
+      "isco_code": "5120",
+      "title": "Cook",
+      "description": "Prepares food in restaurants, food stalls or domestic settings",
+      "skills": [
+        {"label": "food preparation and cooking", "reusability": "sector-specific", "is_durable": true},
+        {"label": "menu planning", "reusability": "sector-specific", "is_durable": true},
+        {"label": "food hygiene and safety", "reusability": "cross-sector", "is_durable": true},
+        {"label": "cost and ingredient management", "reusability": "cross-sector", "is_durable": true}
+      ],
+      "durable_skills": ["creativity", "time management", "consistency"],
+      "relevant_countries": ["UGA", "BGD"],
+      "opportunity_types": ["self_employment", "informal_wage", "formal_employment"],
+      "informal_friendly": true
+    },
+    {
+      "isco_code": "4132",
+      "title": "Data Entry Clerk",
+      "description": "Enters and processes data using computers and data entry software",
+      "skills": [
+        {"label": "data entry and typing", "reusability": "cross-sector", "is_durable": false},
+        {"label": "basic computer operation", "reusability": "cross-sector", "is_durable": true},
+        {"label": "spreadsheet software", "reusability": "cross-sector", "is_durable": true},
+        {"label": "data accuracy checking", "reusability": "cross-sector", "is_durable": true}
+      ],
+      "durable_skills": ["attention to detail", "digital literacy", "organisation"],
+      "relevant_countries": ["UGA", "BGD"],
+      "opportunity_types": ["formal_employment", "gig", "remote_work"],
+      "informal_friendly": false
+    },
+    {
+      "isco_code": "7124",
+      "title": "Carpenter",
+      "description": "Makes, installs and repairs wooden structures, furniture and fixtures",
+      "skills": [
+        {"label": "woodworking and joinery", "reusability": "sector-specific", "is_durable": false},
+        {"label": "measurement and marking", "reusability": "cross-sector", "is_durable": true},
+        {"label": "hand and power tool use", "reusability": "cross-sector", "is_durable": true},
+        {"label": "furniture design basics", "reusability": "sector-specific", "is_durable": true}
+      ],
+      "durable_skills": ["craftsmanship", "spatial thinking", "precision"],
+      "relevant_countries": ["UGA", "BGD"],
+      "opportunity_types": ["self_employment", "informal_wage"],
+      "informal_friendly": true
+    },
+    {
+      "isco_code": "7411",
+      "title": "Electrician",
+      "description": "Installs, maintains and repairs electrical wiring systems",
+      "skills": [
+        {"label": "electrical wiring and installation", "reusability": "sector-specific", "is_durable": false},
+        {"label": "circuit fault diagnosis", "reusability": "sector-specific", "is_durable": true},
+        {"label": "electrical safety compliance", "reusability": "cross-sector", "is_durable": true},
+        {"label": "blueprint reading", "reusability": "cross-sector", "is_durable": true}
+      ],
+      "durable_skills": ["problem-solving", "safety awareness", "continuous upskilling"],
+      "relevant_countries": ["UGA", "BGD"],
+      "opportunity_types": ["self_employment", "formal_employment"],
+      "informal_friendly": true
+    },
+    {
+      "isco_code": "2341",
+      "title": "Primary School Teacher",
+      "description": "Teaches primary level students in academic subjects",
+      "skills": [
+        {"label": "lesson planning and delivery", "reusability": "cross-sector", "is_durable": true},
+        {"label": "student assessment", "reusability": "cross-sector", "is_durable": true},
+        {"label": "classroom management", "reusability": "cross-sector", "is_durable": true},
+        {"label": "curriculum knowledge", "reusability": "sector-specific", "is_durable": true}
+      ],
+      "durable_skills": ["communication", "patience", "organisation", "mentoring"],
+      "relevant_countries": ["UGA", "BGD"],
+      "opportunity_types": ["formal_employment", "ngo_employment", "tutoring"],
+      "informal_friendly": false
+    }
+  ]
+}

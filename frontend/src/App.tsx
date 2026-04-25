@@ -1,9 +1,14 @@
-function App() {
+import { RouterProvider } from 'react-router-dom'
+import { router } from './router'
+import { TopBar } from './components/TopBar'
+import { BottomNav } from './components/BottomNav'
+
+export default function App() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <h1 className="text-4xl font-bold text-gray-900">TalentGraph AI</h1>
-    </div>
+    <>
+      <TopBar />
+      <RouterProvider router={router} />
+      <BottomNav />
+    </>
   )
 }
-
-export default App

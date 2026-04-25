@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Datapilot AI — clean data beautifully</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root { --blue:#1710E6; --lime:#8DC651; --ink:#0e0e12; --paper:#f6f4ef; }
+  html, body { margin: 0; padding: 0; background: var(--paper); color: var(--ink);
+               font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  * { box-sizing: border-box; }
+  ::selection { background: var(--blue); color: var(--paper); }
+  body { scroll-behavior: smooth; }
+  /* Thin scrollbar */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #d9d3c6; border-radius: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  /* Intro overlay */
+  #intro-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: var(--paper);
+    transition: opacity 600ms ease, transform 800ms cubic-bezier(.7,0,.3,1);
+  }
+  #intro-overlay.hidden {
+    opacity: 0;
+    transform: translateY(-6%) scale(0.98);
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+  <div id="intro-overlay">
+    <div id="intro-root" data-screen-label="intro"></div>
+  </div>
+  <div id="site-root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="animations.jsx"></script>
+  <script type="text/babel" src="intro.jsx"></script>
+  <script type="text/babel" src="site.jsx"></script>
+
+  <script type="text/babel">
+    function App() {
+      const [introDone, setIntroDone] = React.useState(() => {
+        try { return localStorage.getItem('datapilot:introDone') === '1'; } catch { return false; }
+      });
+
+      const onEnter = React.useCallback(() => {
+        try { localStorage.setItem('datapilot:introDone', '1'); } catch {}
+        const ov = document.getElementById('intro-overlay');
+        if (ov) ov.classList.add('hidden');
+        setTimeout(() => setIntroDone(true), 650);
+      }, []);
+
+      const onReplay = React.useCallback(() => {
+        try { localStorage.removeItem('datapilot:introDone'); } catch {}
+        const ov = document.getElementById('intro-overlay');
+        if (ov) ov.classList.remove('hidden');
+        setIntroDone(false);
+        try { localStorage.removeItem('animstage:t'); } catch {}
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, []);
+
+      // hide overlay if already done
+      React.useEffect(() => {
+        if (introDone) {
+          const ov = document.getElementById('intro-overlay');
+          if (ov) ov.classList.add('hidden');
+        }
+      }, [introDone]);
+
+      return (
+        <>
+          {/* Site is always mounted behind, so transition is smooth */}
+          <Site onReplay={onReplay}/>
+        </>
+      );
+    }
+
+    function Intro() {
+      const [done, setDone] = React.useState(() => {
+        try { return localStorage.getItem('datapilot:introDone') === '1'; } catch { return false; }
+      });
+      const onEnter = () => {
+        try { localStorage.setItem('datapilot:introDone', '1'); } catch {}
+        const ov = document.getElementById('intro-overlay');
+        if (ov) ov.classList.add('hidden');
+      };
+
+      React.useEffect(() => {
+        if (done) {
+          const ov = document.getElementById('intro-overlay');
+          if (ov) ov.classList.add('hidden');
+        }
+      }, [done]);
+
+      return (
+        <Stage width={1920} height={1080} duration={10} background="#f6f4ef" loop={true}>
+          <IntroMovie onEnter={onEnter}/>
+        </Stage>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('intro-root')).render(<Intro/>);
+    ReactDOM.createRoot(document.getElementById('site-root')).render(<App/>);
+  </script>
+</body>
+</html>
