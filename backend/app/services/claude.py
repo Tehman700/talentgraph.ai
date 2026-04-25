@@ -1,17 +1,17 @@
 import json
 import re
-from google import genai
-from google.genai import types
+from openai import AsyncOpenAI
+from fastapi import HTTPException
 from ..config import settings
 
-_client: genai.Client | None = None
-MODEL = "gemini-2.0-flash"
+_client: AsyncOpenAI | None = None
+MODEL = "gpt-4o-mini"
 
 
-def get_client() -> genai.Client:
+def get_client() -> AsyncOpenAI:
     global _client
     if _client is None:
-        _client = genai.Client(api_key=settings.gemini_api_key)
+        _client = AsyncOpenAI(api_key=settings.openai_api_key)
     return _client
 
 
@@ -24,15 +24,22 @@ def _parse_json(text: str) -> dict | list:
 
 async def _ask(system: str, prompt: str) -> str:
     client = get_client()
-    response = await client.aio.models.generate_content(
-        model=MODEL,
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            system_instruction=system,
-            response_mime_type="application/json",
-        ),
-    )
-    return response.text
+    try:
+        response = await client.chat.completions.create(
+            model=MODEL,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": prompt},
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.3,
+        )
+        return response.choices[0].message.content or "{}"
+    except Exception as e:
+        msg = str(e)
+        if "quota" in msg.lower() or "rate" in msg.lower() or "429" in msg:
+            raise HTTPException(status_code=429, detail=f"OpenAI quota/rate limit hit: {msg}")
+        raise HTTPException(status_code=502, detail=f"OpenAI error: {msg}")
 
 
 async def analyze_skills(input_data: dict, country: dict) -> dict:
@@ -130,6 +137,7 @@ Return a JSON array of skill name strings only. Max 15 skills.
 Job title: {title}
 Description: {description}
 
-Return format: ["skill1", "skill2", ...]""",
+Return format: {{"skills": ["skill1", "skill2", ...]}}""",
     )
-    return _parse_json(result)
+    parsed = _parse_json(result)
+    return parsed.get("skills", parsed) if isinstance(parsed, dict) else parsed

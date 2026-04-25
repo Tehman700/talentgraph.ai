@@ -1,158 +1,188 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAppStore } from '../store'
+import { TalentGlobe } from '../components/TalentGlobe'
+import { NICHE_COLORS } from '../types'
 
-const CHIPS = [
-  { text: '94.7% informal', x: '6%', y: '22%', rotate: '-7deg', bg: '#1710E6', color: '#f6f4ef' },
-  { text: 'normalize ✓', x: '80%', y: '18%', rotate: '5deg', bg: '#fff', color: '#0e0e12', border: true },
-  { text: '1,880 ILO signals', x: '5%', y: '68%', rotate: '4deg', bg: '#8DC651', color: '#0e0e12' },
-  { text: 'ESCO mapped ✓', x: '78%', y: '70%', rotate: '-4deg', bg: '#0e0e12', color: '#f6f4ef' },
-]
+const NICHE_CHIPS = Object.entries(NICHE_COLORS).slice(0, 8).map(([label, color]) => ({ label, color }))
 
 export default function Home() {
   const [mounted, setMounted] = useState(false)
+  const [globeSize, setGlobeSize] = useState(500)
+  const rightColRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
-  const setUserType = useAppStore((s) => s.setUserType)
 
   useEffect(() => {
     const id = setTimeout(() => setMounted(true), 60)
     return () => clearTimeout(id)
   }, [])
 
+  useEffect(() => {
+    if (!rightColRef.current) return
+    const ro = new ResizeObserver(([entry]) => {
+      setGlobeSize(Math.min(entry.contentRect.width - 16, 620))
+    })
+    ro.observe(rightColRef.current)
+    return () => ro.disconnect()
+  }, [])
+
   const reveal = (delay: number) => ({
     opacity: mounted ? 1 : 0,
-    transform: mounted ? 'translateY(0)' : 'translateY(24px)',
-    transition: `opacity 800ms cubic-bezier(.2,.7,.2,1) ${delay}ms, transform 800ms cubic-bezier(.2,.7,.2,1) ${delay}ms`,
+    transform: mounted ? 'translateY(0)' : 'translateY(18px)',
+    transition: `opacity 700ms ease ${delay}ms, transform 700ms ease ${delay}ms`,
   })
 
-  const handleCTA = (type: 'worker' | 'policy') => {
-    setUserType(type)
-    navigate(type === 'worker' ? '/onboarding' : '/policy')
-  }
+  const mono = { fontFamily: 'var(--font-mono)' }
+  const serif = { fontFamily: 'var(--font-serif)' }
 
   return (
     <section
-      style={{ background: '#f6f4ef', fontFamily: 'var(--font-mono)' }}
-      className="min-h-screen relative flex flex-col items-center justify-center px-10 pt-20 pb-32"
+      style={{ background: '#f6f4ef', ...mono, minHeight: '100svh' }}
+      className="flex flex-col md:flex-row items-stretch pt-16 overflow-hidden"
     >
-      {/* Kicker */}
-      <div
-        style={{ ...reveal(100), color: '#6b6458', letterSpacing: '0.3em' }}
-        className="text-xs uppercase mb-12"
-      >
-        — SkillPath · Module 01 + 03 —
-      </div>
-
-      {/* Headline */}
-      <h1
-        style={{
-          fontFamily: 'var(--font-serif)',
-          fontSize: 'clamp(40px, 5.5vw, 76px)',
-          lineHeight: 1.1,
-          letterSpacing: '-0.02em',
-          ...reveal(200),
-        }}
-        className="text-center text-ink m-0 max-w-4xl"
-      >
-        Know your skills.{' '}
-        <em
-          style={{
-            fontStyle: 'italic',
-            color: '#8DC651',
-            position: 'relative',
-          }}
-        >
-          Find your path
-          <svg
-            viewBox="0 0 300 14"
-            preserveAspectRatio="none"
-            style={{
-              position: 'absolute',
-              left: 0,
-              bottom: -4,
-              width: '100%',
-              height: 10,
-              opacity: mounted ? 1 : 0,
-              transition: 'opacity 600ms 1200ms',
-            }}
-          >
-            <path d="M2 8 Q 75 2 150 7 T 298 5" stroke="#8DC651" strokeWidth="3.5" fill="none" strokeLinecap="round" />
-          </svg>
-        </em>
-        <span style={{ color: '#1710E6' }}>.</span>
-      </h1>
-
-      {/* Subtext */}
-      <p
-        style={{ ...reveal(500), color: '#4a453d', maxWidth: 600, lineHeight: 1.65 }}
-        className="text-base text-center mt-16 normal-case tracking-normal"
-      >
-        For workers in the informal economy — in Uganda, Bangladesh, and beyond.
-        Upload your experience, get a standardized skills profile, and see{' '}
-        <strong style={{ color: '#0e0e12' }}>real, reachable opportunities</strong> backed by ILO data.
-      </p>
-
-      {/* CTAs */}
-      <div style={reveal(700)} className="flex gap-4 mt-12">
-        <button
-          onClick={() => handleCTA('worker')}
-          style={{ background: '#0e0e12', color: '#f6f4ef', fontFamily: 'var(--font-mono)' }}
-          className="px-7 py-3.5 rounded text-sm cursor-pointer border-none hover:bg-blue transition-colors normal-case tracking-normal"
-        >
-          I'm a Worker →
-        </button>
-        <button
-          onClick={() => handleCTA('policy')}
-          style={{ background: '#fff', color: '#0e0e12', border: '1.5px solid #0e0e12', fontFamily: 'var(--font-mono)' }}
-          className="px-7 py-3.5 rounded text-sm cursor-pointer hover:bg-paper transition-colors normal-case tracking-normal"
-        >
-          I'm a Policymaker
-        </button>
-      </div>
-
-      {/* Floating chips */}
-      {CHIPS.map((chip, i) => (
-        <div
-          key={i}
-          style={{
-            position: 'absolute',
-            left: chip.x,
-            top: chip.y,
-            background: chip.bg,
-            color: chip.color,
-            border: chip.border ? '1.5px solid #0e0e12' : 'none',
-            padding: '9px 16px',
-            borderRadius: 999,
-            fontFamily: 'var(--font-mono)',
-            fontSize: 13,
-            transform: `rotate(${chip.rotate})`,
-            boxShadow: '0 10px 30px rgba(14,14,18,0.1)',
-            opacity: mounted ? 1 : 0,
-            transition: `opacity 700ms ${600 + i * 200}ms`,
-            pointerEvents: 'none',
-          }}
-        >
-          {chip.text}
+      {/* Left column */}
+      <div className="flex flex-col justify-center px-8 md:px-14 lg:px-18 py-12 md:py-0 md:w-5/12 flex-shrink-0">
+        <div style={{ ...reveal(60), color: '#6b6458', letterSpacing: '0.25em' }} className="text-xs uppercase mb-8">
+          — TalentGraph · Global Talent Network —
         </div>
-      ))}
 
-      {/* Country pills */}
-      <div style={{ ...reveal(900) }} className="flex gap-3 mt-10">
-        {['🇺🇬 Uganda', '🇧🇩 Bangladesh'].map((c) => (
-          <span
-            key={c}
-            style={{ background: '#fff', border: '1px solid #d9d3c6', fontFamily: 'var(--font-mono)' }}
-            className="px-4 py-1.5 rounded-full text-xs text-ink normal-case tracking-normal"
-          >
-            {c}
-          </span>
-        ))}
-        <span
-          style={{ background: '#fff', border: '1px dashed #d9d3c6', fontFamily: 'var(--font-mono)' }}
-          className="px-4 py-1.5 rounded-full text-xs text-ink normal-case tracking-normal opacity-60"
+        <h1
+          style={{
+            ...serif,
+            fontSize: 'clamp(34px, 3.8vw, 56px)',
+            lineHeight: 1.08,
+            letterSpacing: '-0.02em',
+            color: '#0e0e12',
+            ...reveal(160),
+          }}
+          className="m-0"
         >
-          + more coming
-        </span>
+          Global talent,{' '}
+          <em style={{ fontStyle: 'italic', position: 'relative', display: 'inline-block' }}>
+            mapped
+            <svg
+              viewBox="0 0 140 10"
+              preserveAspectRatio="none"
+              style={{
+                position: 'absolute', left: 0, bottom: -3,
+                width: '100%', height: 8,
+                opacity: mounted ? 1 : 0,
+                transition: 'opacity 500ms 1000ms',
+              }}
+            >
+              <path d="M2 6 Q 35 2 70 5 T 138 3" stroke="#8DC651" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+            </svg>
+          </em>
+          <span style={{ color: '#1710E6' }}>.</span>
+        </h1>
+
+        <p style={{ ...reveal(360), color: '#4a453d', lineHeight: 1.65, maxWidth: 370 }} className="text-sm mt-5 mb-0">
+          Whether you're a developer with GitHub repos, a farmer with 20 years of experience,
+          or a company looking to hire — TalentGraph puts real skills on the map.
+        </p>
+
+        {/* Stats */}
+        <div style={reveal(500)} className="flex gap-6 mt-7">
+          {[
+            { value: '90+', label: 'Profiles' },
+            { value: '40+', label: 'Countries' },
+            { value: '17', label: 'Niches' },
+          ].map(({ value, label }) => (
+            <div key={label}>
+              <div style={{ color: '#1710E6', ...serif, fontSize: 22, fontWeight: 700, fontStyle: 'italic' }}>
+                {value}
+              </div>
+              <div style={{ color: '#9a8f82', fontSize: 10, letterSpacing: '0.1em' }} className="uppercase mt-0.5">
+                {label}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* CTAs */}
+        <div style={reveal(640)} className="flex gap-3 mt-8 flex-wrap">
+          <button
+            onClick={() => navigate('/onboard')}
+            style={{ background: '#0e0e12', color: '#f6f4ef', ...mono }}
+            className="px-7 py-3 rounded text-sm cursor-pointer border-none"
+          >
+            I'm a Professional →
+          </button>
+          <button
+            onClick={() => navigate('/onboard-org')}
+            style={{ background: '#1710E6', color: '#f6f4ef', ...mono }}
+            className="px-7 py-3 rounded text-sm cursor-pointer border-none"
+          >
+            We're Hiring →
+          </button>
+        </div>
+
+        {/* Explore link */}
+        <div style={reveal(780)} className="mt-5">
+          <button
+            onClick={() => navigate('/explore')}
+            style={{ background: 'transparent', border: 'none', color: '#6b6458', ...mono, cursor: 'pointer' }}
+            className="text-xs underline underline-offset-4"
+          >
+            Browse the talent globe →
+          </button>
+        </div>
+      </div>
+
+      {/* Right column — Globe */}
+      <div
+        ref={rightColRef}
+        className="flex-1 flex flex-col items-center justify-center relative py-8 md:py-0"
+        style={{ minHeight: 400 }}
+      >
+        <div style={{ opacity: mounted ? 1 : 0, transition: 'opacity 1200ms 200ms', position: 'relative' }}>
+          <TalentGlobe size={globeSize} showLegend={false} />
+
+          {/* Floating niche chips */}
+          {NICHE_CHIPS.map((chip, i) => {
+            const positions = [
+              { top: '6%', left: '4%' }, { top: '10%', right: '6%' },
+              { top: '78%', left: '2%' }, { top: '82%', right: '4%' },
+              { top: '40%', left: '-2%' }, { top: '36%', right: '-2%' },
+              { top: '55%', left: '6%' }, { top: '60%', right: '5%' },
+            ]
+            const pos = positions[i] || { top: `${10 + i * 10}%`, left: '0%' }
+            return (
+              <div
+                key={chip.label}
+                style={{
+                  position: 'absolute',
+                  ...pos,
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  background: 'rgba(14,14,18,0.85)',
+                  backdropFilter: 'blur(8px)',
+                  border: `1px solid ${chip.color}40`,
+                  padding: '5px 11px', borderRadius: 999,
+                  ...mono, fontSize: 10, color: '#f6f4ef',
+                  opacity: mounted ? 1 : 0,
+                  transition: `opacity 600ms ${800 + i * 120}ms`,
+                  pointerEvents: 'none', whiteSpace: 'nowrap',
+                }}
+              >
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: chip.color, boxShadow: `0 0 5px ${chip.color}` }} />
+                {chip.label}
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Live indicator */}
+        <div style={{
+          position: 'absolute', bottom: 28, right: 24,
+          display: 'flex', alignItems: 'center', gap: 6,
+          ...mono, fontSize: 10, color: '#9a8f82', letterSpacing: '0.15em',
+          opacity: mounted ? 1 : 0, transition: 'opacity 600ms 1400ms',
+        }}>
+          <span style={{
+            width: 7, height: 7, borderRadius: '50%',
+            background: '#8DC651', boxShadow: '0 0 8px #8DC651',
+          }} />
+          LIVE TALENT MAP
+        </div>
       </div>
     </section>
   )

@@ -2,11 +2,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    openai_api_key: str = ""
     supabase_url: str = ""
     supabase_service_key: str = ""
     supabase_anon_key: str = ""
-    claude_api_key: str = ""
-    gemini_api_key: str = ""
     resend_api_key: str = ""
     mapbox_token: str = ""
 

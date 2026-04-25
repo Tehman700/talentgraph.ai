@@ -12,7 +12,23 @@ def get_country(code: str) -> dict | None:
     if not path.exists():
         return None
     with open(path, encoding="utf-8") as f:
-        return json.load(f)
+        country = json.load(f)
+    # Overlay real ILO signals if available
+    ilo = get_ilo_signals()
+    if code.upper() in ilo:
+        live = ilo[code.upper()]
+        s = country["signals"]
+        s["avg_monthly_wage_usd"] = live.get("total_wage_usd", s["avg_monthly_wage_usd"])
+        s["total_employed_thousands"] = live.get("total_emp_k", s.get("total_employed_thousands"))
+        # Update sector employment % from ILO data where available
+        for sector in country.get("sectors", []):
+            name_lower = sector["name"].lower()
+            if "agricult" in name_lower:
+                sector["employment_pct"] = live.get("agriculture_emp_pct", sector["employment_pct"])
+                sector["avg_wage_usd"] = round(live.get("agriculture_wage_usd", sector["avg_wage_usd"]))
+            elif "ict" in name_lower or "digital" in name_lower:
+                sector["avg_wage_usd"] = round(live.get("services_wage_usd", sector["avg_wage_usd"]))
+    return country
 
 
 @lru_cache(maxsize=1)
@@ -38,6 +54,16 @@ def get_esco_seed() -> dict:
 
 
 @lru_cache(maxsize=1)
+def get_ilo_signals() -> dict:
+    """Real ILO earnings + employment data extracted from ILO Dataset 01 & 02."""
+    path = DATA_DIR / "ilo_signals.json"
+    if not path.exists():
+        return {}
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+@lru_cache(maxsize=1)
 def get_ilo_catalog() -> list[dict]:
     path = ROOT_DIR / "ESCO Skills Taxonomy Dataset.json"
     with open(path, encoding="utf-8") as f:
@@ -45,7 +71,6 @@ def get_ilo_catalog() -> list[dict]:
 
 
 def get_ilo_signals_for_country(country_code: str) -> list[dict]:
-    """Return ILO catalog entries that are relevant labor market signals."""
     signal_subjects = {"EMP", "EAR", "UNE", "POV", "SKL", "STW"}
     catalog = get_ilo_catalog()
     return [

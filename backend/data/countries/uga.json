@@ -18,40 +18,45 @@
     "informal_employment_pct": 94.7,
     "youth_unemployment_pct": 13.4,
     "working_poverty_rate": 58.2,
-    "avg_monthly_wage_usd": 145,
+    "avg_monthly_wage_usd": 161,
     "gdp_growth_pct": 5.3,
     "population_millions": 47.1,
-    "data_year": 2023,
-    "data_source": "ILO ILOSTAT, World Bank WDI 2023"
+    "total_employed_thousands": 17969.6,
+    "data_year": 2021,
+    "data_source": "ILO ILOSTAT LFS 2021"
   },
   "sectors": [
     {
       "name": "Agriculture",
-      "employment_pct": 69.3,
+      "employment_pct": 64.4,
+      "employment_thousands": 11571.9,
       "growth_rate_pct": 3.2,
-      "avg_wage_usd": 80,
-      "opportunity_types": ["self_employment", "cooperative", "seasonal_wage"],
+      "avg_wage_usd": 46,
+      "opportunity_types": ["self_employment", "cooperative", "piece_rate"],
       "informal_dominant": true
     },
     {
       "name": "Wholesale & Retail Trade",
       "employment_pct": 10.1,
+      "employment_thousands": 1814.9,
       "growth_rate_pct": 4.1,
       "avg_wage_usd": 120,
-      "opportunity_types": ["self_employment", "informal_wage"],
+      "opportunity_types": ["self_employment", "gig"],
       "informal_dominant": true
     },
     {
       "name": "Construction",
       "employment_pct": 4.2,
+      "employment_thousands": 754.7,
       "growth_rate_pct": 5.8,
       "avg_wage_usd": 130,
-      "opportunity_types": ["informal_wage", "piece_rate"],
+      "opportunity_types": ["gig", "piece_rate"],
       "informal_dominant": true
     },
     {
       "name": "Transport & Storage",
       "employment_pct": 3.4,
+      "employment_thousands": 611.0,
       "growth_rate_pct": 4.9,
       "avg_wage_usd": 140,
       "opportunity_types": ["self_employment", "gig"],
@@ -60,21 +65,32 @@
     {
       "name": "Manufacturing",
       "employment_pct": 3.1,
+      "employment_thousands": 556.9,
       "growth_rate_pct": 6.2,
-      "avg_wage_usd": 150,
-      "opportunity_types": ["formal_employment", "informal_wage"],
+      "avg_wage_usd": 130,
+      "opportunity_types": ["formal_employment", "piece_rate"],
       "informal_dominant": false
     },
     {
       "name": "ICT & Digital Services",
       "employment_pct": 0.8,
+      "employment_thousands": 143.8,
       "growth_rate_pct": 12.4,
-      "avg_wage_usd": 280,
-      "opportunity_types": ["formal_employment", "freelance", "gig"],
+      "avg_wage_usd": 204,
+      "opportunity_types": ["formal_employment", "gig"],
+      "informal_dominant": false
+    },
+    {
+      "name": "Public Services & Education",
+      "employment_pct": 5.8,
+      "employment_thousands": 1042.2,
+      "growth_rate_pct": 2.1,
+      "avg_wage_usd": 188,
+      "opportunity_types": ["formal_employment", "training"],
       "informal_dominant": false
     }
   ],
-  "opportunity_types_available": ["formal_employment", "self_employment", "gig", "training", "cooperative", "seasonal_wage"],
+  "opportunity_types_available": ["formal_employment", "self_employment", "gig", "training", "cooperative", "piece_rate"],
   "automation_risk_note": "Automation exposure is lower than high-income countries. Routine manual tasks in agriculture and trade face moderate risk. Digital and care economy roles are most resilient.",
   "local_realities": [
     "Most workers are self-employed or in family enterprises",

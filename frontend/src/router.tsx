@@ -6,6 +6,7 @@ import Onboarding from './pages/Onboarding'
 import SkillsProfile from './pages/SkillsProfile'
 import Opportunities from './pages/Opportunities'
 import PolicyDashboard from './pages/PolicyDashboard'
+import Dashboard from './pages/Dashboard'
 
 function RootLayout() {
   return (
@@ -25,7 +26,8 @@ export const router = createBrowserRouter([
       { path: '/onboarding', element: <Onboarding /> },
       { path: '/profile', element: <SkillsProfile /> },
       { path: '/opportunities', element: <Opportunities /> },
-      { path: '/policy', element: <PolicyDashboard /> },
+      { path: '/policy',      element: <PolicyDashboard /> },
+      { path: '/dashboard',   element: <Dashboard /> },
     ],
   },
 ])

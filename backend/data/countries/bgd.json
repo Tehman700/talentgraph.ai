@@ -19,59 +19,66 @@
     "informal_employment_pct": 85.1,
     "youth_unemployment_pct": 15.7,
     "working_poverty_rate": 24.6,
-    "avg_monthly_wage_usd": 180,
+    "avg_monthly_wage_usd": 134,
     "gdp_growth_pct": 6.4,
     "population_millions": 170.0,
-    "data_year": 2023,
-    "data_source": "ILO ILOSTAT, World Bank WDI 2023"
+    "total_employed_thousands": 69071.6,
+    "data_year": 2024,
+    "data_source": "ILO ILOSTAT LFS 2024"
   },
   "sectors": [
     {
       "name": "Agriculture",
-      "employment_pct": 38.6,
+      "employment_pct": 44.7,
+      "employment_thousands": 30854.8,
       "growth_rate_pct": 2.8,
-      "avg_wage_usd": 90,
-      "opportunity_types": ["self_employment", "seasonal_wage", "cooperative"],
+      "avg_wage_usd": 95,
+      "opportunity_types": ["self_employment", "piece_rate", "cooperative"],
       "informal_dominant": true
     },
     {
       "name": "Garments & Textile (RMG)",
       "employment_pct": 14.2,
+      "employment_thousands": 9808.2,
       "growth_rate_pct": 3.5,
-      "avg_wage_usd": 155,
+      "avg_wage_usd": 135,
       "opportunity_types": ["formal_employment", "piece_rate"],
       "informal_dominant": false
     },
     {
       "name": "Wholesale & Retail Trade",
       "employment_pct": 15.3,
+      "employment_thousands": 10567.9,
       "growth_rate_pct": 4.2,
       "avg_wage_usd": 140,
-      "opportunity_types": ["self_employment", "informal_wage"],
+      "opportunity_types": ["self_employment", "gig"],
       "informal_dominant": true
     },
     {
       "name": "Construction",
       "employment_pct": 5.8,
+      "employment_thousands": 4006.1,
       "growth_rate_pct": 6.1,
-      "avg_wage_usd": 160,
-      "opportunity_types": ["informal_wage", "piece_rate"],
+      "avg_wage_usd": 135,
+      "opportunity_types": ["gig", "piece_rate"],
       "informal_dominant": true
     },
     {
       "name": "Transport & Storage",
       "employment_pct": 4.6,
+      "employment_thousands": 3177.3,
       "growth_rate_pct": 5.3,
-      "avg_wage_usd": 150,
+      "avg_wage_usd": 149,
       "opportunity_types": ["self_employment", "gig"],
       "informal_dominant": true
     },
     {
       "name": "ICT & Digital Services",
       "employment_pct": 1.2,
+      "employment_thousands": 828.9,
       "growth_rate_pct": 15.1,
-      "avg_wage_usd": 320,
-      "opportunity_types": ["formal_employment", "freelance", "gig"],
+      "avg_wage_usd": 149,
+      "opportunity_types": ["formal_employment", "gig"],
       "informal_dominant": false
     }
   ],

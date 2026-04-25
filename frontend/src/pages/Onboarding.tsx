@@ -259,7 +259,7 @@ export default function Onboarding() {
               Ready to analyze
             </h1>
             <p className="text-sm mb-8" style={{ color: '#6b6458' }}>
-              Claude AI will map your experience to the ESCO skills framework.
+              Advanced AI will map your experience to the ESCO skills framework.
             </p>
             <div style={{ background: '#fff', border: '1px solid #d9d3c6', borderRadius: 8, padding: 20 }} className="space-y-3 text-sm">
               <div className="flex justify-between">
@@ -280,10 +280,15 @@ export default function Onboarding() {
               </div>
             </div>
             {error && (
-              <p style={{ background: '#fee', border: '1px solid #fcc', borderRadius: 6, padding: 12 }}
-                className="text-sm mt-4 text-red-700">
-                {error}
-              </p>
+              <div style={{ background: '#fff3f3', border: '1px solid #ffcdd2', borderRadius: 8, padding: '14px 16px', marginTop: 16 }}>
+                <div style={{ color: '#b71c1c', fontWeight: 700, fontSize: 13, marginBottom: 4 }}>Analysis failed</div>
+                <div style={{ color: '#c62828', fontSize: 12, lineHeight: 1.6 }}>{error}</div>
+                {error.includes('quota') && (
+                  <div style={{ marginTop: 10, fontSize: 12, color: '#4a453d', lineHeight: 1.6 }}>
+                    Fix: go to <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" style={{ color: '#1710E6' }}>aistudio.google.com/apikey</a>, create a new API key, and update <code>GEMINI_API_KEY</code> in <code>backend/.env</code>, then restart the backend server.
+                  </div>
+                )}
+              </div>
             )}
           </div>
         )}
@@ -315,7 +320,7 @@ export default function Onboarding() {
               style={{ ...mono, background: '#8DC651', color: '#0e0e12' }}
               className="px-8 py-2.5 rounded text-sm cursor-pointer border-none font-semibold disabled:opacity-50"
             >
-              {loading ? 'Analyzing with Claude AI...' : 'Analyze my skills →'}
+              {loading ? 'Analyzing with GPT-4o…' : 'Analyze my skills →'}
             </button>
           )}
         </div>
