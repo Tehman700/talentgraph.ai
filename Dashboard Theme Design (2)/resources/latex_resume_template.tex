@@ -1,0 +1,174 @@
+%% ─────────────────────────────────────────────────────────────────────────────
+%% ATS-Optimized Resume Template
+%% Used by the LLM to generate ATS-friendly resumes.
+%%
+%% Design principles:
+%%   • Single-column layout — no multi-column (confuses most ATS parsers)
+%%   • No graphics, images, tables, or fancy symbols
+%%   • Standard LaTeX fonts — no exotic font packages
+%%   • All sections use plain text with clear, keyword-rich headings
+%%   • Dates on the right with \hfill for clean parsing
+%% ─────────────────────────────────────────────────────────────────────────────
+
+\documentclass[11pt,letterpaper]{article}
+
+%% ── Packages ──────────────────────────────────────────────────────────────────
+\usepackage[margin=0.75in]{geometry}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+
+%% ── Hyperlink styling (invisible but clickable) ───────────────────────────────
+\hypersetup{
+  colorlinks=true,
+  urlcolor=black,
+  linkcolor=black,
+}
+
+%% ── Section heading style ─────────────────────────────────────────────────────
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\titlerule \vspace{-5pt}]
+
+%% ── No page numbers ───────────────────────────────────────────────────────────
+\pagestyle{empty}
+
+%% ── List item spacing ─────────────────────────────────────────────────────────
+\setlist[itemize]{leftmargin=*,topsep=0pt,itemsep=1pt,parsep=0pt}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\begin{document}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+%%  CONTACT HEADER
+%% ═══════════════════════════════════════════════════════════════════════════════
+\begin{center}
+  {\Huge \textbf{{{CANDIDATE_NAME}}}} \\[4pt]
+  {\large {{TAGLINE}}} \\[6pt]
+  {{LOCATION}}
+  $\,|\,$ \href{mailto:{{EMAIL}}}{{{EMAIL}}}
+  $\,|\,$ {{PHONE}}
+  $\,|\,$ \href{{{LINKEDIN_URL}}}{LinkedIn}
+  $\,|\,$ \href{https://github.com/{{GITHUB_USERNAME}}}{GitHub}
+  {{PORTFOLIO_LINE}}
+\end{center}
+
+\vspace{4pt}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+%%  PROFESSIONAL SUMMARY
+%% ═══════════════════════════════════════════════════════════════════════════════
+\section{Summary}
+
+{{PROFESSIONAL_SUMMARY}}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+%%  SKILLS
+%% ═══════════════════════════════════════════════════════════════════════════════
+\section{Skills}
+
+\begin{itemize}
+  \item \textbf{Technical Skills:} {{TECHNICAL_SKILLS_LIST}}
+  \item \textbf{Tools \& Platforms:} {{TOOLS_AND_PLATFORMS}}
+  \item \textbf{Soft Skills:} {{SOFT_SKILLS_LIST}}
+\end{itemize}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+%%  PROFESSIONAL EXPERIENCE
+%% ═══════════════════════════════════════════════════════════════════════════════
+\section{Experience}
+
+%% ── Job Entry Template ── (repeat this block for each role) ──────────────────
+\textbf{{{JOB_TITLE}}} \hfill {{START_DATE}} -- {{END_DATE}} \\
+\textit{{{COMPANY_NAME}}} \hfill \textit{{{COMPANY_LOCATION}}}
+\begin{itemize}
+  \item {{ACHIEVEMENT_1}}
+  \item {{ACHIEVEMENT_2}}
+  \item {{ACHIEVEMENT_3}}
+\end{itemize}
+
+\vspace{4pt}
+
+%% ── Additional role (example) ─────────────────────────────────────────────────
+\textbf{{{JOB_TITLE_2}}} \hfill {{START_DATE_2}} -- {{END_DATE_2}} \\
+\textit{{{COMPANY_NAME_2}}} \hfill \textit{{{COMPANY_LOCATION_2}}}
+\begin{itemize}
+  \item {{ACHIEVEMENT_2_1}}
+  \item {{ACHIEVEMENT_2_2}}
+\end{itemize}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+%%  EDUCATION
+%% ═══════════════════════════════════════════════════════════════════════════════
+\section{Education}
+
+\textbf{{{DEGREE}}} in {{FIELD_OF_STUDY}} \hfill {{GRAD_YEAR}} \\
+\textit{{{INSTITUTION_NAME}}} \hfill \textit{{{INSTITUTION_LOCATION}}} \\
+{{EDUCATION_DETAIL}}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+%%  PROJECTS  (optional — remove section if not applicable)
+%% ═══════════════════════════════════════════════════════════════════════════════
+\section{Projects}
+
+\textbf{\href{{{PROJECT_URL}}}{{{PROJECT_NAME}}}} \hfill {{PROJECT_DATE}} \\
+\textit{Tech stack: {{PROJECT_TECH_STACK}}}
+\begin{itemize}
+  \item {{PROJECT_DESCRIPTION}}
+  \item {{PROJECT_IMPACT}}
+\end{itemize}
+
+\vspace{4pt}
+
+\textbf{{{PROJECT_NAME_2}}} \hfill {{PROJECT_DATE_2}} \\
+\textit{Tech stack: {{PROJECT_TECH_STACK_2}}}
+\begin{itemize}
+  \item {{PROJECT_DESCRIPTION_2}}
+\end{itemize}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+%%  CERTIFICATIONS  (optional)
+%% ═══════════════════════════════════════════════════════════════════════════════
+\section{Certifications}
+
+\begin{itemize}
+  \item \textbf{{{CERT_NAME_1}}} --- {{CERT_ISSUER_1}}, {{CERT_DATE_1}}
+  \item \textbf{{{CERT_NAME_2}}} --- {{CERT_ISSUER_2}}, {{CERT_DATE_2}}
+\end{itemize}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+%%  LANGUAGES  (optional)
+%% ═══════════════════════════════════════════════════════════════════════════════
+\section{Languages}
+
+\begin{itemize}
+  \item {{LANGUAGE_1}}: {{FLUENCY_1}}
+  \item {{LANGUAGE_2}}: {{FLUENCY_2}}
+\end{itemize}
+
+\end{document}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+%%  LLM GENERATION INSTRUCTIONS
+%% ─────────────────────────────────────────────────────────────────────────────
+%%
+%%  When filling in this template, the LLM should:
+%%
+%%  1. Replace all {{PLACEHOLDER}} tokens with real content from the profile.
+%%  2. Remove optional sections (Projects, Certifications, Languages) if data
+%%     is not available — do not leave placeholder tokens in the output.
+%%  3. Write achievement bullets in the STAR format (Situation, Task, Action,
+%%     Result) using strong action verbs: Led, Built, Reduced, Improved, etc.
+%%  4. Quantify achievements wherever possible: "Reduced load time by 40%".
+%%  5. Mirror keywords from target job descriptions for ATS matching.
+%%  6. Keep the Professional Summary to 3-4 sentences max.
+%%  7. Do NOT include: photos, tables, text boxes, colored text, or decorative
+%%     symbols — all of these can break ATS parsing.
+%%  8. Dates must follow the format: "Jan 2022 -- Mar 2024" or "2022 -- 2024".
+%%  9. {{PORTFOLIO_LINE}} should be:
+%%       $\,|\,$ \href{URL}{Portfolio}
+%%     or empty string "" if no portfolio URL is provided.
+%% ─────────────────────────────────────────────────────────────────────────────

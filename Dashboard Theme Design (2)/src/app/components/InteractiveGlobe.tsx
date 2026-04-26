@@ -15,6 +15,15 @@ interface Worker {
   lat: number;
   lng: number;
   matchScore?: number;
+  // Profile card fields
+  photo_url?: string;
+  tagline?: string;
+  linkedin_url?: string;
+  github_username?: string;
+  twitter_handle?: string;
+  portfolio_url?: string;
+  resume_url?: string;
+  profile_slug?: string;
 }
 
 interface CountryData {
@@ -70,27 +79,52 @@ const countryDataMap: Record<string, CountryData> = {
   'Ghana': { name: 'Ghana', code: 'GHA', informalEmploymentPct: 89.2, avgMonthlyWageUSD: 155, workingPovertyRate: 44.5, youthUnemploymentPct: 11.2 }
 };
 
-export function InteractiveGlobe() {
+// ── Shared data export (used by MainDashboard) ─────────────────────────
+export { workers as DEMO_WORKERS };
+export type { Worker };
+
+interface InteractiveGlobeProps {
+  /** Called when a user point is clicked on the globe */
+  onWorkerSelect?: (worker: Worker) => void;
+  /** When provided, overrides the internal filter dropdowns */
+  externalFilters?: {
+    sector?: string;
+    education?: string;
+    skill?: string;
+    location?: string;
+  };
+  /** Hide the built-in filter panel (used when MainDashboard has its own) */
+  hideFilterPanel?: boolean;
+}
+
+export function InteractiveGlobe({ onWorkerSelect, externalFilters, hideFilterPanel }: InteractiveGlobeProps = {}) {
   const globeEl = useRef<any>();
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [countries, setCountries] = useState({ features: [] });
 
-  // Filters
+  // Filters — use external if provided, else internal state
   const [filterSector, setFilterSector] = useState<string>('all');
   const [filterEducation, setFilterEducation] = useState<string>('all');
   const [filterSkill, setFilterSkill] = useState<string>('all');
+
+  const activeSector    = externalFilters?.sector    ?? filterSector;
+  const activeEducation = externalFilters?.education ?? filterEducation;
+  const activeSkill     = externalFilters?.skill     ?? filterSkill;
 
   const sectors = ['all', 'Wholesale & Retail Trade', 'ICT Services', 'Agriculture', 'Manufacturing', 'Transportation', 'Personal Services', 'Construction'];
   const allSkills = ['all', ...Array.from(new Set(workers.flatMap(w => w.skills)))];
 
   const filteredWorkers = useMemo(() => {
     return workers.filter(w => {
-      if (filterSector !== 'all' && w.sector !== filterSector) return false;
-      if (filterEducation !== 'all' && w.education !== filterEducation) return false;
-      if (filterSkill !== 'all' && !w.skills.includes(filterSkill)) return false;
+      if (activeSector    !== 'all' && w.sector !== activeSector) return false;
+      if (activeEducation !== 'all' && w.education !== activeEducation) return false;
+      if (activeSkill     !== 'all' && !w.skills.includes(activeSkill)) return false;
+      if (externalFilters?.location && externalFilters.location !== 'all') {
+        if (w.country.toLowerCase() !== externalFilters.location.toLowerCase()) return false;
+      }
       return true;
     });
-  }, [filterSector, filterEducation, filterSkill]);
+  }, [activeSector, activeEducation, activeSkill, externalFilters?.location]);
 
   const countryWorkerCounts = useMemo(() => {
     return filteredWorkers.reduce((acc, worker) => {
@@ -171,36 +205,74 @@ export function InteractiveGlobe() {
         pointColor={() => '#8DC651'}
         pointAltitude={0.02}
         pointRadius={0.35}
-        pointLabel={(point: any) => `
-          <div style="background: #f6f4ef; padding: 14px; border-radius: 12px; border: 2px solid #8DC651; font-family: 'JetBrains Mono', monospace; min-width: 240px; box-shadow: 0 8px 24px rgba(141,198,81,0.2);">
-            <div style="display: flex; align-items: start; gap: 12px; margin-bottom: 10px;">
-              <div>
-                <div style="color: #1a1a1a; font-weight: 700; font-size: 15px; font-family: 'Instrument Serif', serif;">${point.name}</div>
-                <div style="color: #1710E6; font-size: 12px; font-weight: 600; margin-top: 2px;">${point.occupation}</div>
+        onPointClick={(point: any) => onWorkerSelect?.(point as Worker)}
+        pointLabel={(point: any) => {
+          const w = point as Worker;
+          const initials = (w.name || '?')
+            .split(' ').map((p: string) => p[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+          const avatarInner = w.photo_url
+            ? `<img src="${w.photo_url}" alt="${w.name}" style="width:100%;height:100%;object-fit:cover;display:block;">`
+            : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;">${initials || '?'}</div>`;
+
+          const tagline = w.tagline || w.occupation || '';
+          const location = w.country || '';
+
+          const socialPills = [
+            w.linkedin_url
+              ? `<a href="${w.linkedin_url}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:3px 8px;background:#0A66C2;color:#fff;border-radius:4px;font-size:9px;font-weight:700;text-decoration:none;">in&nbsp;LinkedIn</a>`
+              : '',
+            w.github_username
+              ? `<a href="https://github.com/${w.github_username}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:3px 8px;background:#24292e;color:#fff;border-radius:4px;font-size:9px;font-weight:700;text-decoration:none;">gh&nbsp;GitHub</a>`
+              : '',
+            w.portfolio_url
+              ? `<a href="${w.portfolio_url}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:3px 8px;background:#8DC651;color:#1a1a1a;border-radius:4px;font-size:9px;font-weight:700;text-decoration:none;">↗&nbsp;Portfolio</a>`
+              : '',
+          ].filter(Boolean).join('');
+
+          const resumeSlug = w.profile_slug || w.id;
+          const resumeUrl  = w.resume_url || (resumeSlug ? `/resume/${resumeSlug}` : '');
+          const resumeBtn  = resumeUrl
+            ? `<a href="${resumeUrl}" target="_blank" rel="noopener" style="display:block;margin-top:10px;padding:7px 12px;background:#1710E6;color:#fff;border-radius:6px;font-size:10px;font-weight:700;text-align:center;text-decoration:none;letter-spacing:0.05em;">View ATS Resume ↗</a>`
+            : '';
+
+          const skillPills = w.skills.slice(0, 3).map((skill: string) =>
+            `<span style="background:#1710E6;color:#fff;padding:3px 6px;border-radius:4px;font-size:9px;text-transform:uppercase;letter-spacing:0.3px;">${skill}</span>`
+          ).join('');
+
+          return `
+            <div style="background:#f6f4ef;padding:16px;border-radius:14px;border:2px solid #8DC651;font-family:'JetBrains Mono',monospace;min-width:240px;max-width:280px;box-shadow:0 8px 28px rgba(141,198,81,0.25);">
+              <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
+                <div style="width:48px;height:48px;border-radius:50%;flex-shrink:0;overflow:hidden;background:#1710E6;border:2px solid #8DC651;">${avatarInner}</div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-family:'Instrument Serif',serif;font-weight:700;font-size:15px;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${w.name}</div>
+                  ${tagline ? `<div style="color:#1710E6;font-size:11px;font-weight:600;margin-top:2px;">${tagline}</div>` : ''}
+                  ${location ? `<div style="color:#6B7280;font-size:10px;margin-top:2px;">${location}</div>` : ''}
+                </div>
               </div>
-            </div>
-            <div style="background: #fff; padding: 8px; border-radius: 6px; margin-bottom: 8px;">
-              <div style="color: #6B7280; font-size: 10px; margin-bottom: 4px;">SECTOR</div>
-              <div style="color: #1a1a1a; font-size: 11px; font-weight: 600;">${point.sector}</div>
-            </div>
-            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-              <div style="background: #fff; padding: 6px 8px; border-radius: 6px; flex: 1;">
-                <div style="color: #6B7280; font-size: 9px;">EXP</div>
-                <div style="color: #1710E6; font-size: 12px; font-weight: 700;">${point.experienceYears}y</div>
+              <div style="display:flex;gap:8px;margin-bottom:10px;">
+                <div style="background:#fff;padding:6px 10px;border-radius:6px;flex:1;">
+                  <div style="color:#6B7280;font-size:9px;text-transform:uppercase;">Exp</div>
+                  <div style="color:#1710E6;font-size:13px;font-weight:700;">${w.experienceYears}y</div>
+                </div>
+                ${w.matchScore != null ? `
+                  <div style="background:#fff;padding:6px 10px;border-radius:6px;flex:1;">
+                    <div style="color:#6B7280;font-size:9px;text-transform:uppercase;">Match</div>
+                    <div style="color:#8DC651;font-size:13px;font-weight:700;">${(w.matchScore * 100).toFixed(0)}%</div>
+                  </div>` : ''}
+                <div style="background:#fff;padding:6px 10px;border-radius:6px;flex:1;">
+                  <div style="color:#6B7280;font-size:9px;text-transform:uppercase;">Sector</div>
+                  <div style="color:#1a1a1a;font-size:10px;font-weight:600;line-height:1.3;">${w.sector}</div>
+                </div>
               </div>
-              <div style="background: #fff; padding: 6px 8px; border-radius: 6px; flex: 1;">
-                <div style="color: #6B7280; font-size: 9px;">MATCH</div>
-                <div style="color: #8DC651; font-size: 12px; font-weight: 700;">${(point.matchScore * 100).toFixed(0)}%</div>
-              </div>
+              ${w.skills.length ? `
+                <div style="color:#1710E6;font-size:9px;font-weight:600;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.05em;">Skills</div>
+                <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">${skillPills}</div>
+              ` : ''}
+              ${socialPills ? `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:4px;">${socialPills}</div>` : ''}
+              ${resumeBtn}
             </div>
-            <div style="color: #1710E6; font-size: 10px; font-weight: 600; margin-bottom: 4px;">SKILLS</div>
-            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-              ${point.skills.slice(0, 3).map((skill: string) => `
-                <span style="background: #1710E6; color: #fff; padding: 3px 6px; border-radius: 4px; font-size: 9px; text-transform: uppercase; letter-spacing: 0.3px;">${skill}</span>
-              `).join('')}
-            </div>
-          </div>
-        `}
+          `;
+        }}
       />
 
       {/* Header */}
@@ -209,8 +281,8 @@ export function InteractiveGlobe() {
         <p className="text-sm text-[#6B7280] mt-1" style={{ fontFamily: 'JetBrains Mono, monospace' }}>Informal Economy Workers · LMICs</p>
       </div>
 
-      {/* Filter Panel */}
-      <div className="absolute top-6 left-6 bg-[#f6f4ef] rounded-xl border-2 border-[#1710E6] p-5 shadow-xl max-w-xs" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+      {/* Filter Panel — hidden when MainDashboard provides its own */}
+      {!hideFilterPanel && <div className="absolute top-6 left-6 bg-[#f6f4ef] rounded-xl border-2 border-[#1710E6] p-5 shadow-xl max-w-xs" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
         <div className="flex items-center gap-2 mb-4">
           <Filter className="h-5 w-5 text-[#1710E6]" />
           <h3 className="text-sm font-bold text-[#1710E6]">FILTER WORKERS</h3>
@@ -265,7 +337,7 @@ export function InteractiveGlobe() {
             </div>
           </div>
         </div>
-      </div>
+      </div>}
 
       {/* Stats Panel */}
       <div className="absolute top-6 right-6 bg-[#f6f4ef] rounded-xl border-2 border-[#8DC651] p-5 shadow-xl" style={{ fontFamily: 'JetBrains Mono, monospace' }}>

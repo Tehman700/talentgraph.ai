@@ -91,6 +91,20 @@ export function TopBar() {
                     zIndex: 50,
                   }}>
                     <button
+                      onClick={() => { setMenuOpen(false); navigate('/explore') }}
+                      style={{ width: '100%', background: 'none', border: 'none', padding: '12px 16px', textAlign: 'left', fontFamily: 'var(--font-mono)', fontSize: 12, color: '#0e0e12', cursor: 'pointer' }}
+                    >
+                      Browse Globe
+                    </button>
+                    <div style={{ height: 1, background: '#e8e3db' }} />
+                    <button
+                      onClick={() => { setMenuOpen(false); navigate('/become-worker') }}
+                      style={{ width: '100%', background: 'none', border: 'none', padding: '12px 16px', textAlign: 'left', fontFamily: 'var(--font-mono)', fontSize: 12, color: '#0e0e12', cursor: 'pointer' }}
+                    >
+                      Become a Worker
+                    </button>
+                    <div style={{ height: 1, background: '#e8e3db' }} />
+                    <button
                       onClick={() => { setMenuOpen(false); navigate('/dashboard') }}
                       style={{ width: '100%', background: 'none', border: 'none', padding: '12px 16px', textAlign: 'left', fontFamily: 'var(--font-mono)', fontSize: 12, color: '#0e0e12', cursor: 'pointer' }}
                     >

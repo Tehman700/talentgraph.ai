@@ -64,6 +64,7 @@ export interface CountryConfig extends CountrySummary {
     youth_unemployment_pct: number
     working_poverty_rate: number
     avg_monthly_wage_usd: number
+    population_millions?: number
     gdp_growth_pct: number
     data_year: number
     data_source: string
@@ -114,17 +115,26 @@ export interface TalentPoint {
   name: string
   role_type: RoleType
   niche: string
+  profession?: string
+  similarity?: number
   skills: string[]
   experience_years: number
+  experience_level?: 'junior' | 'mid' | 'senior'
   city: string
+  state?: string
   country: string
-  country_code: string
+  country_code?: string
   lat: number
   lng: number
   bio: string
   color?: string
   match_score?: number
   github_username?: string
+  linkedin_url?: string
+  photo_url?: string
+  resume_url?: string
+  verify_github?: boolean
+  verify_linkedin?: boolean
 }
 
 export interface ExtractedProfile {

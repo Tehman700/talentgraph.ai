@@ -1,0 +1,145 @@
+{
+  "_meta": {
+    "description": "Preferred professional platforms for each niche/profession. Used to suggest the most relevant social/portfolio links on profile creation and to verify connected platforms.",
+    "primary": "Most important platform for recruiters in this niche",
+    "secondary": "Additional platforms that add credibility",
+    "portfolio": "Where to showcase actual work",
+    "community": "Professional communities and discussion forums"
+  },
+
+  "Frontend Development": {
+    "primary": "GitHub",
+    "secondary": ["LinkedIn", "Twitter/X"],
+    "portfolio": ["Personal website", "CodePen", "StackBlitz"],
+    "community": ["Dev.to", "Hashnode", "Frontend Masters Discord"],
+    "profile_tips": "Pin 3-5 live GitHub repos with demos. CodePen for CSS experiments. Personal domain adds credibility."
+  },
+
+  "Backend Engineering": {
+    "primary": "GitHub",
+    "secondary": ["LinkedIn", "Stack Overflow"],
+    "portfolio": ["GitHub repositories", "Personal website", "DockerHub"],
+    "community": ["HackerNews", "Reddit r/programming", "Dev.to"],
+    "profile_tips": "Show system design writeups or architecture diagrams. Open source contributions count heavily."
+  },
+
+  "Mobile Development": {
+    "primary": "GitHub",
+    "secondary": ["LinkedIn", "App Store / Play Store"],
+    "portfolio": ["App Store links", "Google Play links", "GitHub repositories"],
+    "community": ["iOS Dev Weekly", "Android Dev Summit", "Flutter Community"],
+    "profile_tips": "Direct links to published apps are the most powerful proof of skill."
+  },
+
+  "DevOps & Cloud": {
+    "primary": "LinkedIn",
+    "secondary": ["GitHub", "Credly (certifications)"],
+    "portfolio": ["GitHub (IaC code)", "Personal blog", "Credly badges"],
+    "community": ["DevOps subreddit", "CNCF Slack", "HashiCorp Discuss"],
+    "profile_tips": "Cloud certifications (AWS, GCP, Azure) are extremely valued. Credly profile for badge display."
+  },
+
+  "Data Science & ML": {
+    "primary": "Kaggle",
+    "secondary": ["LinkedIn", "GitHub", "Google Scholar"],
+    "portfolio": ["Kaggle notebooks", "GitHub repositories", "Hugging Face"],
+    "community": ["Kaggle", "Fast.ai Forums", "Papers With Code"],
+    "profile_tips": "Kaggle competition rankings and notebook votes are direct signals to recruiters."
+  },
+
+  "UX & Design": {
+    "primary": "Behance",
+    "secondary": ["Dribbble", "LinkedIn"],
+    "portfolio": ["Behance portfolio", "Dribbble shots", "Figma Community"],
+    "community": ["Dribbble", "Designer Slack communities", "ADPList"],
+    "profile_tips": "Behance case studies with process (research → wireframe → final) outweigh final screenshots alone."
+  },
+
+  "Security": {
+    "primary": "LinkedIn",
+    "secondary": ["GitHub", "HackerOne / Bugcrowd"],
+    "portfolio": ["GitHub (tools, CTF writeups)", "Personal blog", "HackerOne profile"],
+    "community": ["DEFCON Groups", "CTFtime.org", "Security BSides"],
+    "profile_tips": "Bug bounty hall-of-fame entries and CVE credits are strong portfolio signals."
+  },
+
+  "Blockchain": {
+    "primary": "GitHub",
+    "secondary": ["LinkedIn", "Twitter/X"],
+    "portfolio": ["GitHub repositories", "Etherscan contract addresses", "Personal website"],
+    "community": ["Ethereum Magicians", "Substrate Developers Hub", "Mirror.xyz"],
+    "profile_tips": "Deployed smart contract addresses on mainnet/testnet are verifiable proof of work."
+  },
+
+  "Game Development": {
+    "primary": "itch.io",
+    "secondary": ["GitHub", "LinkedIn"],
+    "portfolio": ["itch.io games", "Unity Asset Store", "GameJolt"],
+    "community": ["GameDev.net", "r/gamedev", "Discord game dev servers"],
+    "profile_tips": "Playable demos on itch.io are far more convincing than a portfolio PDF."
+  },
+
+  "Agriculture": {
+    "primary": "LinkedIn",
+    "secondary": ["Facebook (local groups)", "WhatsApp Business"],
+    "portfolio": ["LinkedIn posts with field photos", "Personal website"],
+    "community": ["FAO rural networks", "Local agricultural cooperatives"],
+    "profile_tips": "Document specific crops, yields, and techniques. Certifications from agricultural extension services help."
+  },
+
+  "Healthcare": {
+    "primary": "LinkedIn",
+    "secondary": ["ResearchGate", "Doximity (physicians)"],
+    "portfolio": ["LinkedIn", "ResearchGate publications", "Personal clinic site"],
+    "community": ["WHO Global Health Workforce Alliance", "Local health worker networks"],
+    "profile_tips": "Licensure numbers, published research, and verified credentials matter most in this field."
+  },
+
+  "Education": {
+    "primary": "LinkedIn",
+    "secondary": ["ResearchGate", "Academia.edu"],
+    "portfolio": ["LinkedIn", "Online course links (Coursera, Udemy)", "School/university profile"],
+    "community": ["Educator Facebook groups", "Teachers Pay Teachers"],
+    "profile_tips": "List certifications, teaching licenses, and student outcomes. Video lesson samples add strong proof."
+  },
+
+  "Finance": {
+    "primary": "LinkedIn",
+    "secondary": ["CFA Institute profile", "Bloomberg profile"],
+    "portfolio": ["LinkedIn", "Personal finance blog"],
+    "community": ["CFA Society", "r/finance", "Financial Analysts Discord"],
+    "profile_tips": "Certifications (CFA, CPA, ACCA) are highly weighted. Quantify results wherever possible."
+  },
+
+  "Construction": {
+    "primary": "LinkedIn",
+    "secondary": ["Facebook Business", "Local contractor directories"],
+    "portfolio": ["Before/after project photos", "Houzz profile", "Personal website"],
+    "community": ["Local construction guilds", "BIM Community"],
+    "profile_tips": "Photo documentation of completed projects is the most compelling portfolio in this field."
+  },
+
+  "Manufacturing": {
+    "primary": "LinkedIn",
+    "secondary": ["Xing (Germany/Europe)", "Industry-specific job boards"],
+    "portfolio": ["LinkedIn", "Process improvement case studies"],
+    "community": ["ASQ (quality)", "Local manufacturer associations"],
+    "profile_tips": "Certifications in Lean, Six Sigma, or ISO standards significantly boost profile credibility."
+  },
+
+  "Retail": {
+    "primary": "LinkedIn",
+    "secondary": ["Facebook Business", "Instagram"],
+    "portfolio": ["LinkedIn", "Instagram (product/store photos)"],
+    "community": ["National Retail Federation", "Local merchant associations"],
+    "profile_tips": "Sales metrics and customer satisfaction scores are the strongest signals in retail roles."
+  },
+
+  "Hospitality": {
+    "primary": "LinkedIn",
+    "secondary": ["TripAdvisor (management)", "Facebook"],
+    "portfolio": ["LinkedIn", "TripAdvisor management responses", "Instagram"],
+    "community": ["AHLA", "Local hotel/restaurant associations"],
+    "profile_tips": "Guest review scores, occupancy rates, and revenue metrics are the most valued KPIs to mention."
+  }
+}

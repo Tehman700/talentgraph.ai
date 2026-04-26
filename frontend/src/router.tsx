@@ -12,6 +12,9 @@ import SkillsProfile from './pages/SkillsProfile'
 import Opportunities from './pages/Opportunities'
 import PolicyDashboard from './pages/PolicyDashboard'
 import Dashboard from './pages/Dashboard'
+import ApplyForm from './pages/ApplyForm'
+import OrgForms from './pages/OrgForms'
+import BecomeWorker from './pages/BecomeWorker'
 
 function RootLayout() {
   return (
@@ -96,7 +99,10 @@ export const router = createBrowserRouter([
       { path: '/opportunities', element: <Opportunities /> },
       { path: '/policy',      element: <PolicyDashboard /> },
       { path: '/dashboard',   element: <Dashboard /> },
+      { path: '/become-worker', element: <BecomeWorker /> },
+      { path: '/org-forms',   element: <OrgForms /> },
       { path: '/org/:id', element: <OrgMatches /> },
+      { path: '/apply/:formId', element: <ApplyForm /> },
       { path: '*', element: <RouteErrorPage /> },
     ],
   },

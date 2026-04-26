@@ -101,11 +101,18 @@ export default function Home() {
         {/* CTAs */}
         <div style={reveal(640)} className="flex gap-3 mt-8 flex-wrap">
           <button
-            onClick={() => navigate('/onboard')}
+            onClick={() => navigate('/explore')}
             style={{ background: '#0e0e12', color: '#f6f4ef', ...mono }}
             className="px-7 py-3 rounded text-sm cursor-pointer border-none"
           >
-            I'm a Professional →
+            Browse Workers →
+          </button>
+          <button
+            onClick={() => navigate('/become-worker')}
+            style={{ background: '#8DC651', color: '#0e0e12', ...mono }}
+            className="px-7 py-3 rounded text-sm cursor-pointer border-none"
+          >
+            Become a Worker →
           </button>
           <button
             onClick={() => navigate('/onboard-org')}
@@ -135,7 +142,7 @@ export default function Home() {
         style={{ minHeight: 400 }}
       >
         <div style={{ opacity: mounted ? 1 : 0, transition: 'opacity 1200ms 200ms', position: 'relative' }}>
-          <TalentGlobe size={globeSize} showLegend={false} />
+          <TalentGlobe size={globeSize} showLegend={false} visualStyle="classic" />
 
           {/* Floating niche chips */}
           {NICHE_CHIPS.map((chip, i) => {

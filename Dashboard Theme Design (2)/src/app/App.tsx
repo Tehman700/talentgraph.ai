@@ -1,9 +1,5 @@
-import { InteractiveGlobe } from './components/InteractiveGlobe';
+import MainDashboard from './components/MainDashboard';
 
 export default function App() {
-  return (
-    <div className="h-screen w-screen bg-[#F9FAFB] overflow-hidden">
-      <InteractiveGlobe />
-    </div>
-  );
+  return <MainDashboard />;
 }

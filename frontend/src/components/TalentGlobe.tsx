@@ -1,6 +1,6 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useMemo, useState } from 'react'
 import Globe from 'react-globe.gl'
-import type { TalentPoint, NICHE_COLORS as NicheColorsType } from '../types'
+import type { TalentPoint } from '../types'
 import { NICHE_COLORS } from '../types'
 
 // Static demo data shown when no dynamic points are passed
@@ -46,12 +46,72 @@ interface Props {
   points?: TalentPoint[]
   mode?: 'explore' | 'match'
   onPointClick?: (point: TalentPoint) => void
+  visualStyle?: 'theme' | 'classic'
 }
 
-export function TalentGlobe({ size = 520, showLegend = true, points, mode = 'explore', onPointClick }: Props) {
+function hashText(value: string): number {
+  let hash = 0
+  for (let i = 0; i < value.length; i += 1) {
+    hash = (hash << 5) - hash + value.charCodeAt(i)
+    hash |= 0
+  }
+  return Math.abs(hash)
+}
+
+function seededUnit(seed: number, salt: number): number {
+  const x = Math.sin((seed + salt) * 12.9898) * 43758.5453
+  return x - Math.floor(x)
+}
+
+function spreadPointsByCountry(points: TalentPoint[]): TalentPoint[] {
+  const grouped = points.reduce((acc, p) => {
+    const key = (p.country || 'unknown').toLowerCase()
+    if (!acc[key]) acc[key] = []
+    acc[key].push(p)
+    return acc
+  }, {} as Record<string, TalentPoint[]>)
+
+  const spread: TalentPoint[] = []
+  for (const list of Object.values(grouped)) {
+    const total = list.length
+    if (total <= 1) {
+      spread.push(list[0])
+      continue
+    }
+    const baseRadius = Math.min(1.2 + total * 0.14, 3.8)
+    list.forEach((p, idx) => {
+      const key = `${p.id || p.name || 'person'}:${idx}`
+      const seed = hashText(key)
+      const angle = seededUnit(seed, 17) * Math.PI * 2
+      const radiusNoise = Math.sqrt(seededUnit(seed, 53))
+      const radius = baseRadius * (0.35 + radiusNoise * 0.95)
+      const latOffset = Math.sin(angle) * radius
+      const lngOffset = Math.cos(angle) * radius
+      spread.push({
+        ...p,
+        lat: (p.lat || 0) + latOffset,
+        lng: (p.lng || 0) + lngOffset,
+      })
+    })
+  }
+  return spread
+}
+
+export function TalentGlobe({ size = 520, showLegend = true, points, mode = 'explore', onPointClick, visualStyle = 'theme' }: Props) {
   const globeRef = useRef<any>(null)
+  const [countries, setCountries] = useState<{ features: any[] }>({ features: [] })
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null)
   const displayPoints = points && points.length > 0 ? points : DEMO_POINTS
+  const plottedPoints = useMemo(() => spreadPointsByCountry(displayPoints), [displayPoints])
   const showArcs = !points || points.length === 0
+
+  const countryWorkerCounts = useMemo(() => {
+    return plottedPoints.reduce((acc, p) => {
+      const key = p.country || 'Unknown'
+      acc[key] = (acc[key] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
+  }, [plottedPoints])
 
   useEffect(() => {
     const el = globeRef.current
@@ -62,7 +122,45 @@ export function TalentGlobe({ size = 520, showLegend = true, points, mode = 'exp
     el.controls().minDistance = 200
     el.controls().maxDistance = 600
     el.pointOfView({ lat: 15, lng: 30, altitude: 2.2 }, 1400)
-  }, [])
+
+    // Theme globe: keep original dark-blue sea style, but slightly lighter.
+    if (visualStyle === 'theme') {
+      const material = el.globeMaterial?.()
+      if (material) {
+        material.color.set('#b7d4ee')
+        material.emissive.set('#2b5f90')
+        material.emissiveIntensity = 0.08
+        material.transparent = false
+        material.opacity = 1
+      }
+    }
+
+    const stopAutoRotate = () => {
+      if (!el?.controls) return
+      el.controls().autoRotate = false
+    }
+
+    const domEl = el.renderer?.()?.domElement
+    domEl?.addEventListener('pointerdown', stopAutoRotate, { passive: true })
+    domEl?.addEventListener('wheel', stopAutoRotate, { passive: true })
+    domEl?.addEventListener('touchstart', stopAutoRotate, { passive: true })
+
+    const idleTimeout = setTimeout(() => {
+      if (el?.controls) el.controls().autoRotate = false
+    }, 12000)
+
+    fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson')
+      .then((res) => res.json())
+      .then((data) => setCountries({ features: data.features || [] }))
+      .catch(() => setCountries({ features: [] }))
+
+    return () => {
+      clearTimeout(idleTimeout)
+      domEl?.removeEventListener('pointerdown', stopAutoRotate)
+      domEl?.removeEventListener('wheel', stopAutoRotate)
+      domEl?.removeEventListener('touchstart', stopAutoRotate)
+    }
+  }, [visualStyle])
 
   const getColor = (p: TalentPoint) => {
     if (mode === 'match' && p.match_score !== undefined) {
@@ -80,6 +178,15 @@ export function TalentGlobe({ size = 520, showLegend = true, points, mode = 'exp
     return 0.05 + Math.min((p.experience_years || 1) / 25, 1) * 0.1
   }
 
+  const getCountryColor = (countryName: string) => {
+    const workerCount = countryWorkerCounts[countryName] || 0
+    if (selectedCountry === countryName) return '#2f7d32'
+    if (workerCount === 0) return '#d4d1c7'
+    if (workerCount >= 3) return '#3f8f45'
+    if (workerCount === 2) return '#78b96e'
+    return '#9fd293'
+  }
+
   const legendItems = mode === 'match'
     ? [
         { color: '#ef4444', label: 'Strong match (55%+)' },
@@ -94,31 +201,91 @@ export function TalentGlobe({ size = 520, showLegend = true, points, mode = 'exp
         ref={globeRef}
         width={size}
         height={size}
-        backgroundColor="rgba(0,0,0,0)"
-        atmosphereColor="#1710E6"
-        atmosphereAltitude={0.18}
-        pointsData={displayPoints}
+        globeImageUrl={visualStyle === 'theme' ? '//unpkg.com/three-globe/example/img/earth-blue-marble.jpg' : undefined}
+        backgroundColor={visualStyle === 'theme' ? 'rgba(246,244,239,1)' : 'rgba(0,0,0,0)'}
+        atmosphereColor={visualStyle === 'theme' ? '#8fbce0' : '#1710E6'}
+        atmosphereAltitude={visualStyle === 'theme' ? 0.15 : 0.18}
+
+        polygonsData={visualStyle === 'theme' ? countries.features : []}
+        polygonAltitude={(d: any) => {
+          const countryName = d?.properties?.NAME || ''
+          if (selectedCountry === countryName) return 0.018
+          return 0.004
+        }}
+        polygonCapColor={(d: any) => getCountryColor(d?.properties?.NAME || '')}
+        polygonSideColor={() => '#f6f4ef'}
+        polygonStrokeColor={() => '#a39f91'}
+        polygonLabel={(d: any) => {
+          const countryName = d?.properties?.NAME || 'Unknown'
+          const workerCount = countryWorkerCounts[countryName] || 0
+          return `
+            <div style="background:#f6f4ef;padding:12px;border-radius:10px;border:2px solid #1710E6;font-family:'JetBrains Mono',monospace;min-width:180px;">
+              <div style="color:#1a1a1a;font-weight:700;font-size:14px;">${countryName}</div>
+              <div style="margin-top:6px;color:#1710E6;font-weight:800;font-size:24px;">${workerCount}</div>
+              <div style="color:#6B7280;font-size:11px;">${workerCount === 1 ? 'Worker' : 'Workers'}</div>
+            </div>
+          `
+        }}
+        onPolygonClick={(d: any) => visualStyle === 'theme' && setSelectedCountry(d?.properties?.NAME || null)}
+
+        pointsData={plottedPoints}
         pointColor={(p: any) => getColor(p as TalentPoint)}
         pointAltitude={(p: any) => getAltitude(p as TalentPoint)}
-        pointRadius={0.55}
+        pointRadius={0.4}
         pointLabel={(p: any) => {
           const pt = p as TalentPoint
           const color = getColor(pt)
           const matchLine = mode === 'match' && pt.match_score !== undefined
             ? `<br/><span style="color:#f59e0b">Match: ${Math.round(pt.match_score * 100)}%</span>`
             : ''
+          const initials = (pt.name || '?').split(' ').map((x) => x[0]).filter(Boolean).slice(0, 2).join('').toUpperCase()
+          const avatarInner = pt.photo_url
+            ? `<img src="${pt.photo_url}" alt="${pt.name}" style="width:100%;height:100%;object-fit:cover;display:block;">`
+            : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;">${initials || '?'}</div>`
+          const github = pt.github_username
+            ? `<a href="https://github.com/${pt.github_username}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:3px 8px;background:#24292e;color:#fff;border-radius:4px;font-size:9px;font-weight:700;text-decoration:none;">gh GitHub</a>`
+            : ''
+          const linkedin = pt.linkedin_url
+            ? `<a href="${pt.linkedin_url}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:3px 8px;background:#0A66C2;color:#fff;border-radius:4px;font-size:9px;font-weight:700;text-decoration:none;">in LinkedIn</a>`
+            : ''
+          const resume = pt.resume_url
+            ? `<a href="${pt.resume_url}" target="_blank" rel="noopener" style="display:block;margin-top:10px;padding:7px 12px;background:#1710E6;color:#fff;border-radius:6px;font-size:10px;font-weight:700;text-align:center;text-decoration:none;letter-spacing:0.05em;">View Resume ↗</a>`
+            : ''
           return `
             <div style="
-              background:#0e0e12;color:#f6f4ef;
-              padding:9px 14px;border-radius:7px;
-              font-family:'JetBrains Mono',monospace;font-size:11px;
-              border:1px solid rgba(246,244,239,0.18);
-              white-space:nowrap;line-height:1.6;
+              background:#f6f4ef;
+              color:#1a1a1a;
+              padding:14px;
+              border-radius:12px;
+              border:2px solid #8DC651;
+              font-family:'JetBrains Mono',monospace;
+              min-width:220px;
+              max-width:280px;
+              box-shadow:0 8px 28px rgba(141,198,81,0.25);
             ">
-              <span style="color:${color};font-weight:700">${pt.niche}</span><br/>
-              <span style="font-weight:600">${pt.name}</span><br/>
-              ${pt.city}, ${pt.country}${matchLine}<br/>
-              <span style="opacity:0.6">${pt.experience_years}y exp · ${(pt.skills || []).slice(0, 3).join(', ')}</span>
+              <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">
+                <div style="width:42px;height:42px;border-radius:50%;overflow:hidden;background:#1710E6;border:2px solid #8DC651;flex-shrink:0;">${avatarInner}</div>
+                <div style="min-width:0;flex:1;">
+                  <div style="font-family:'Instrument Serif',serif;font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pt.name}</div>
+                  <div style="color:${color};font-size:11px;font-weight:600;">${pt.profession || pt.niche}</div>
+                  <div style="color:#6B7280;font-size:10px;">${pt.city}, ${pt.country}${matchLine}</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;margin-bottom:8px;">
+                <div style="background:#fff;padding:6px 8px;border-radius:6px;flex:1;">
+                  <div style="color:#6B7280;font-size:9px;text-transform:uppercase;">Exp</div>
+                  <div style="color:#1710E6;font-size:12px;font-weight:700;">${pt.experience_years}y</div>
+                </div>
+                <div style="background:#fff;padding:6px 8px;border-radius:6px;flex:1;">
+                  <div style="color:#6B7280;font-size:9px;text-transform:uppercase;">Role</div>
+                  <div style="color:#1a1a1a;font-size:10px;font-weight:600;">${pt.role_type}</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                ${(pt.skills || []).slice(0, 4).map((s) => `<span style="background:#1710E6;color:#fff;padding:3px 6px;border-radius:4px;font-size:9px;text-transform:uppercase;">${s}</span>`).join('')}
+              </div>
+              ${(github || linkedin) ? `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;">${github}${linkedin}</div>` : ''}
+              ${resume}
             </div>
           `
         }}
@@ -131,14 +298,38 @@ export function TalentGlobe({ size = 520, showLegend = true, points, mode = 'exp
         arcDashGap={0.3}
         arcDashAnimateTime={2500}
         ringsData={mode === 'match'
-          ? displayPoints.filter(p => (p.match_score || 0) >= 0.55).slice(0, 8)
-          : displayPoints.filter(p => (p.experience_years || 0) >= 8).slice(0, 8)
+          ? plottedPoints.filter(p => (p.match_score || 0) >= 0.55).slice(0, 8)
+          : plottedPoints.filter(p => (p.experience_years || 0) >= 8).slice(0, 8)
         }
         ringColor={(p: any) => getColor(p as TalentPoint)}
         ringMaxRadius={2.5}
         ringPropagationSpeed={2}
         ringRepeatPeriod={1600}
       />
+
+      {visualStyle === 'theme' && selectedCountry && (
+        <div style={{
+          width: Math.min(size, 420),
+          background: '#f6f4ef',
+          border: '2px solid #1710E6',
+          borderRadius: 10,
+          padding: 12,
+          fontFamily: 'var(--font-mono)',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <div style={{ color: '#1710E6', fontWeight: 700 }}>{selectedCountry}</div>
+            <button
+              onClick={() => setSelectedCountry(null)}
+              style={{ border: 'none', background: 'transparent', color: '#6b6458', cursor: 'pointer', fontSize: 12 }}
+            >
+              Clear
+            </button>
+          </div>
+          <div style={{ color: '#6b6458', fontSize: 12 }}>
+            {countryWorkerCounts[selectedCountry] || 0} workers shown for current filters.
+          </div>
+        </div>
+      )}
 
       {showLegend && (
         <div style={{

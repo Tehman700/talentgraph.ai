@@ -143,3 +143,56 @@ Return format: {{"skills": ["skill1", "skill2", ...]}}""",
     )
     parsed = _parse_json(result)
     return parsed.get("skills", parsed) if isinstance(parsed, dict) else parsed
+
+
+async def generate_ats_resume(profile: dict, sections: dict | None = None) -> dict:
+    """Generate an ATS-optimized LaTeX resume from a talent profile and pre-filtered sections."""
+    skills_str = ", ".join(profile.get("skills") or []) or "none listed"
+    sections_text = ""
+    if sections:
+        for key, text in sections.items():
+            if text:
+                sections_text += f"\n\n=== {key.upper()} ===\n{text}"
+
+    result = await _ask(
+        system=(
+            "You are an expert ATS resume writer. Generate professional, ATS-optimized LaTeX resumes. "
+            "Follow the template structure exactly. Use strong action verbs. Quantify achievements. "
+            "Mirror keywords from the candidate's field. Respond with valid JSON only."
+        ),
+        prompt=f"""Generate an ATS-optimized LaTeX resume using the provided template structure.
+
+CANDIDATE PROFILE:
+- Name: {profile.get("name", "Candidate")}
+- Tagline: {profile.get("tagline", "")}
+- Profession/Niche: {profile.get("profession", profile.get("niche", ""))}
+- Location: {profile.get("location", "")}
+- Email: {profile.get("email", "")}
+- LinkedIn: {profile.get("linkedin_url", "")}
+- GitHub: {profile.get("github_username", "")}
+- Portfolio: {profile.get("portfolio_url", "")}
+- Years of Experience: {profile.get("experience_years", 0)}
+- Key Skills: {skills_str}
+
+RESUME SECTIONS (pre-filtered from uploaded CV):
+{sections_text or "No CV uploaded — generate professional resume content from profile data above."}
+
+INSTRUCTIONS:
+1. Fill in ALL sections of the LaTeX resume template.
+2. Write 2-4 achievement bullets per job role using STAR format with strong action verbs.
+3. Quantify achievements wherever reasonable (percentages, numbers, impact).
+4. Mirror keywords relevant to {profile.get("profession", profile.get("niche", "the candidate's field"))}.
+5. Keep Professional Summary to 3-4 sentences.
+6. Remove any sections where data is unavailable (Projects, Certifications, Languages).
+7. Do NOT include placeholder tokens in the output — replace ALL {{{{PLACEHOLDER}}}} tokens.
+8. Output MUST be valid LaTeX that compiles without errors.
+
+Return this exact JSON:
+{{
+  "latex": "complete LaTeX resume source (string with escaped newlines)",
+  "summary": "3-4 sentence professional summary used in the resume",
+  "key_skills": ["list", "of", "highlighted", "skills"],
+  "ats_keywords": ["keyword1", "keyword2"]
+}}""",
+    )
+    return _parse_json(result)

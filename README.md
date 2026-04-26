@@ -87,53 +87,252 @@ All econometric signals shown in the UI are sourced from real ILO data — not s
 
 ## Project Structure
 
+### Root Configuration Files
+
 ```
 talentgraph.ai/
-├── backend/
-│   ├── main.py                          # FastAPI app + router registration
-│   ├── .env.example                     # Required env vars
-│   ├── pyproject.toml                   # UV dependencies
-│   ├── data/
-│   │   ├── esco_seed.json               # 15 ESCO occupations for LMIC contexts
-│   │   └── countries/
-│   │       ├── uga.json                 # Uganda config + ILO signals
-│   │       └── bgd.json                 # Bangladesh config + ILO signals
-│   └── app/
-│       ├── config.py                    # Pydantic settings (env vars)
-│       ├── database.py                  # Supabase client
-│       ├── auth.py                      # JWT middleware
-│       ├── models/                      # Pydantic request/response schemas
-│       │   ├── talent.py
-│       │   ├── org.py
-│       │   ├── job.py
-│       │   └── connection.py
-│       ├── routers/
-│       │   ├── countries.py             # GET /api/countries, /api/countries/{code}
-│       │   ├── skills.py                # POST /api/skills/analyze (Module 01)
-│       │   └── opportunities.py        # POST /api/opportunities/match (Module 03)
-│       └── services/
-│           ├── claude.py               # Gemini 2.0 Flash integration
-│           ├── data_loader.py          # Country config + ILO + ESCO loader
-│           └── matching.py            # Skill overlap scoring
-│
-├── frontend/
-│   └── src/
-│       ├── types/index.ts              # All TypeScript interfaces
-│       ├── lib/api.ts                  # Fetch wrapper (proxy to :8000)
-│       ├── store/index.ts              # Zustand app state
-│       ├── components/
-│       │   ├── TopBar.tsx              # Fixed top bar (brand + status + clock)
-│       │   └── BottomNav.tsx           # Fixed bottom navigation
-│       └── pages/
-│           ├── Home.tsx                # Landing page
-│           ├── Onboarding.tsx          # 4-step skills input wizard
-│           ├── SkillsProfile.tsx       # Module 01 output
-│           ├── Opportunities.tsx       # Module 03 output (worker view)
-│           └── PolicyDashboard.tsx     # Module 03 output (policymaker view)
-│
-├── ESCO Skills Taxonomy Dataset.json   # ILO ILOSTAT indicators catalog (1,880 records)
-└── Design Files/                       # UI reference designs
+├── README.md                                    # This file — project overview & setup
+├── .gitignore                                   # Git ignore rules
+├── ESCO Skills Taxonomy Dataset.json            # ILO ILOSTAT indicators (1,880 records)
+├── EMP_TEMP_SEX_AGE_ECO_NB_A-20260425T2020.csv # ILO employment data export
+├── EAR_EMTA_SEX_ECO_CUR_NB_A-20260425T2023.csv # ILO earnings data export
+├── supabase_migration_v3.sql                    # DB schema: hiring forms, notifications, responses
+├── supabase_migration_v4.sql                    # DB schema: extended talent profiles (photo, resume URLs)
+├── supabase_migration_v2.sql                    # DB schema: base talent profiles, jobs
+├── supabase_migration.sql                       # Initial DB schema (legacy)
 ```
+
+### Backend (FastAPI + Python 3.12)
+
+```
+backend/
+├── main.py                                      # FastAPI entry point, CORS config, router registration
+├── .env.example                                 # Template for environment variables (GEMINI_API_KEY, SUPABASE_URL, etc.)
+├── .python-version                              # Python 3.12 version pin
+├── pyproject.toml                               # UV dependency manifest (fastapi, pydantic, httpx, playwright, pdfplumber)
+├── uv.lock                                      # Locked dependencies (reproducible builds)
+├── README.md                                    # Backend-specific setup guide
+│
+├── app/
+│   ├── __init__.py                              # Package marker
+│   ├── config.py                                # Pydantic BaseSettings (env var loading, validation)
+│   ├── database.py                              # Supabase client initialization + connection pooling
+│   ├── auth.py                                  # JWT token validation middleware, RLS token generation
+│   │
+│   ├── models/                                  # Pydantic request/response schemas
+│   │   ├── __init__.py
+│   │   ├── talent.py                            # TalentCreate, TalentUpdate, TalentProfile, SkillItem, ProfileLinks
+│   │   ├── org.py                               # Organization, OrgCreate schemas
+│   │   ├── job.py                               # JobPosting, JobCreate schemas
+│   │   └── connection.py                        # Connection tracking schemas
+│   │
+│   ├── routers/                                 # API endpoint handlers
+│   │   ├── __init__.py
+│   │   ├── talent.py                            # GET /api/talent/globe, POST /api/talent/save, /extract/*, /me, /verify-social
+│   │   ├── hiring.py                            # POST /api/hiring/forms, GET /api/hiring/forms/{id}, POST /forms/{id}/respond, /responses, /export.csv, /notifications
+│   │   ├── jobs.py                              # POST /api/jobs/post, GET /api/jobs/globe/{id}
+│   │   ├── countries.py                         # GET /api/countries, /api/countries/{code}, /signals
+│   │   ├── skills.py                            # POST /api/skills/analyze, GET /api/skills/occupations/{country}
+│   │   ├── profile.py                           # User profile management endpoints
+│   │   ├── opportunities.py                     # POST /api/opportunities/match, GET /api/opportunities/policy/{code}
+│   │   └── (other specialized routers as needed)
+│   │
+│   └── services/                                # Business logic & integrations
+│       ├── __init__.py
+│       ├── claude.py                            # GPT-4o-mini + Claude API fallback for LLM tasks (skill analysis, opportunity matching)
+│       ├── talent_extractor.py                  # LinkedIn profile extraction (Playwright), GitHub user data fetch, CV parsing (pdfplumber)
+│       ├── data_loader.py                       # Load & cache: countries/*.json, esco_seed.json, ilo_signals.json
+│       └── matching.py                          # Skill overlap scoring, opportunity ranking by match_score
+│
+├── scripts/
+│   ├── __init__.py
+│   ├── seed_talent.py                           # Load seed_talent.json into Supabase talent_profiles table
+│   └── process_ilo_data.py                      # Parse ILO CSV exports → ilo_signals.json
+│
+└── data/
+    ├── seed_talent.json                         # 600+ worker profiles (name, niche, country, skills, experience_years, bio, photo_url, linkedin_url, etc.)
+    ├── esco_seed.json                           # 15 ESCO occupations (occupation_title, isco_code, description, durable_skills)
+    ├── ilo_signals.json                         # Country-level ILO indicators (informal_employment_pct, avg_monthly_wage_usd, working_poverty_rate, youth_unemployment_pct)
+    └── countries/
+        ├── uga.json                             # Uganda config: geo bounds, ILO signals, sector breakdown
+        └── bgd.json                             # Bangladesh config: geo bounds, ILO signals, sector breakdown
+```
+
+### Frontend (React 19 + TypeScript + Vite)
+
+```
+frontend/
+├── package.json                                 # Dependencies: react, vite, tailwind, zustand, react-router, react-globe.gl, shadcn/ui
+├── package-lock.json                            # Locked dependencies
+├── vite.config.ts                               # Vite build config, dev server proxy to localhost:8000
+├── tsconfig.json                                # TypeScript compiler options (strict mode, jsx react-jsx)
+├── tsconfig.app.json                            # Frontend-specific TypeScript config
+├── tsconfig.node.json                           # Node tooling TypeScript config (Vite)
+├── eslint.config.js                             # ESLint rules
+├── .env.example                                 # Frontend env template (VITE_API_URL, SUPABASE_ANON_KEY)
+├── .gitignore                                   # Git ignore rules
+├── index.html                                   # HTML entry point
+├── README.md                                    # Frontend-specific setup guide
+├── generate_seed.cjs                            # Script to generate seed profile data
+│
+├── public/
+│   ├── favicon.svg                              # App icon
+│   └── icons.svg                                # SVG icon sprite
+│
+└── src/
+    ├── main.tsx                                 # React entry point, mount to #root
+    ├── App.tsx                                  # App wrapper component
+    ├── App.css                                  # Global styles
+    ├── index.css                                # Tailwind + custom fonts (mono, serif)
+    ├── router.tsx                               # React Router config (all routes + lazy loading)
+    │
+    ├── types/
+    │   └── index.ts                             # TypeScript interfaces: TalentPoint, ExtractedProfile, JobPosting, HiringForm, FormResponse, TECH_NICHES, NON_TECH_NICHES, NICHE_COLORS
+    │
+    ├── lib/
+    │   ├── api.ts                               # Fetch wrapper with all API methods (getTalentGlobe, saveTalentProfile, createHiringForm, listOrgForms, submitFormResponse, etc.)
+    │   ├── supabase.ts                          # Supabase client initialization
+    │   └── location.ts                          # Parse country/city from free-text location string
+    │
+    ├── store/
+    │   └── index.ts                             # Zustand global state (authUser, authToken, extractedProfile, location, savedTalentId, jobPosting, notifications)
+    │
+    ├── components/                              # Reusable UI components
+    │   ├── TalentGlobe.tsx                      # Interactive 3D globe (react-globe.gl) with country polygons, worker points, filters, auto-rotate control, green land + light blue sea
+    │   ├── TopBar.tsx                           # Fixed top bar: brand logo, time, auth status, menu (Browse Globe, Become a Worker, My Profiles, Sign out)
+    │   ├── AuthModal.tsx                        # Sign up / Sign in modal (Supabase magic link or email/password)
+    │   ├── FilterPanel.tsx                      # Filter UI: location, profession, skills, role_type, experience (used in Explore)
+    │   └── BottomNav.tsx                        # Bottom navigation (legacy, mostly unused)
+    │
+    ├── pages/                                   # Full-page route components
+    │   ├── Home.tsx                             # Landing page: hero section, CTA buttons (Browse Workers, Become a Worker, We're Hiring), globe with niche chips overlay
+    │   ├── Explore.tsx                          # Browse-first worker discovery (no auth required), real-time filters, worker cards, globe view
+    │   ├── BecomeWorker.tsx                     # Multi-step profile creation: name, profession, niche, location, skills, bio, photo/resume URLs, social links, verification
+    │   ├── OrgMatches.tsx                       # Organization hiring dashboard: globe + filtered candidates, "Apply to X candidates" button, form builder modal
+    │   ├── ApplyForm.tsx                        # Candidate-facing form submission UI with dynamic question rendering
+    │   ├── OrgForms.tsx                         # Organization response dashboard: list forms, view responses, export CSV
+    │   ├── Dashboard.tsx                        # User profile list + pending applications notification section
+    │   ├── Onboarding.tsx                       # Legacy: 4-step skills input wizard
+    │   ├── Onboard.tsx                          # Legacy entry point
+    │   ├── OnboardTech.tsx                      # Legacy: tech worker onboarding flow
+    │   ├── OnboardNonTech.tsx                   # Legacy: non-tech worker onboarding flow
+    │   ├── OnboardOrg.tsx                       # Legacy: organization onboarding flow
+    │   ├── SkillsProfile.tsx                    # Legacy: Module 01 output (skills analysis)
+    │   ├── Opportunities.tsx                    # Legacy: Module 03 output (opportunity matching)
+    │   └── PolicyDashboard.tsx                  # Legacy: Module 03 policymaker view
+    │
+    └── assets/
+        ├── hero.png                             # Hero section background image
+        ├── vite.svg                             # Vite logo
+        └── react.svg                            # React logo
+```
+
+### Dashboard Theme Design (Reference UI Library)
+
+```
+Dashboard Theme Design (2)/
+├── vite.config.ts                              # Vite config for theme design project
+├── package.json                                # Dependencies: react, vite, tailwind, shadcn/ui, react-globe.gl
+├── index.html                                  # HTML entry point
+├── pnpm-workspace.yaml                         # Workspace config
+├── postcss.config.mjs                          # PostCSS + Tailwind processor
+├── README.md                                   # Project documentation
+├── ATTRIBUTIONS.md                             # Component attribution (shadcn/ui)
+├── default_shadcn_theme.css                    # Default shadcn/ui theme variables
+├── globe_visualization.js                      # Globe utility functions (PROFESSION_COLORS, assignUserTags, profileToPoint, groupByCountry, etc.)
+│
+├── src/
+│   ├── main.tsx                                # Entry point
+│   ├── app/
+│   │   ├── App.tsx                             # App wrapper
+│   │   ├── components/
+│   │   │   ├── InteractiveGlobe.tsx            # Full-featured globe component (polygons, worker tooltips, filters, stats panel) — used in main TalentGlobe.tsx
+│   │   │   ├── MainDashboard.tsx               # Dashboard layout container
+│   │   │   ├── Navbar.tsx                      # Top navigation bar
+│   │   │   ├── Sidebar.tsx                     # Left sidebar navigation
+│   │   │   ├── ChatPanel.tsx                   # Chat/messaging panel
+│   │   │   ├── DataVisualization.tsx           # Data chart components
+│   │   │   ├── VersionControl.tsx              # Version control UI
+│   │   │   └── figma/
+│   │   │       └── ImageWithFallback.tsx       # Image loading component
+│   │   └── components/ui/                      # 50+ shadcn/ui components
+│   │       ├── button.tsx, card.tsx, dialog.tsx, dropdown-menu.tsx, form.tsx
+│   │       ├── input.tsx, label.tsx, textarea.tsx, select.tsx
+│   │       ├── checkbox.tsx, radio-group.tsx, toggle.tsx, switch.tsx
+│   │       ├── tabs.tsx, accordion.tsx, collapsible.tsx
+│   │       ├── alert.tsx, toast.tsx (via sonner.tsx)
+│   │       ├── modal/alert-dialog.tsx, sheet.tsx, drawer.tsx
+│   │       ├── table.tsx, pagination.tsx
+│   │       ├── chart.tsx, progress.tsx, slider.tsx, skeleton.tsx
+│   │       ├── badge.tsx, breadcrumb.tsx, avatar.tsx, tooltip.tsx
+│   │       ├── popover.tsx, hover-card.tsx, context-menu.tsx, navigation-menu.tsx
+│   │       ├── separator.tsx, scroll-area.tsx, resizable.tsx
+│   │       ├── carousel.tsx, aspect-ratio.tsx, calendar.tsx
+│   │       ├── input-otp.tsx, menubar.tsx, command.tsx
+│   │       └── use-mobile.ts, utils.ts (helpers)
+│   │
+│   ├── styles/
+│   │   ├── index.css                           # Main stylesheet entry
+│   │   ├── theme.css                           # Theme variables (colors, spacing, shadows)
+│   │   ├── tailwind.css                        # Tailwind CSS directives
+│   │   └── fonts.css                           # Custom font definitions
+│   │
+│   ├── imports/
+│   │   └── pasted_text/
+│   │       └── skillpath-project-overview.md   # Project context document
+│   │
+│   └── organization_dashboard/
+│       ├── organization_dashboard.js           # Org hiring dashboard UI
+│       └── hiring_form.js                      # Form builder component
+│
+├── user_profile_creation/
+│   ├── profile_form.js                         # Profile creation form
+│   └── profile_card.js                         # Profile display card
+│
+├── user_resume_generation/
+│   ├── resume_generation.js                    # Resume generation logic
+│   └── ats_resume_formatter.js                 # ATS-optimized resume formatting
+│
+├── resources/
+│   ├── latex_resume_template.tex               # LaTeX resume template
+│   └── preferred_platforms.json                # Platform recommendations per profession
+```
+
+### Resources & Utilities
+
+```
+resources/
+├── latex_resume.txt                            # LaTeX resume template text
+└── prefered_platform_per_profession.txt        # Platform recommendations (GitHub, LinkedIn, Portfolio, etc.)
+
+Design Files/
+├── package.json                                # Figma-inspired design project config
+├── site.jsx                                    # Design site wrapper
+├── intro.jsx                                   # Intro component
+├── animations.jsx                              # Animation library
+├── Datapilot AI.html                           # Design reference HTML
+└── uploads/                                    # Design screenshots & mockups
+    ├── Screenshot 2026-04-23 015809.png
+    ├── Screenshot 2026-04-23 015723.png
+    └── pasted-*.png (various design assets)
+```
+
+### Database Migrations (Supabase PostgreSQL)
+
+```
+supabase_migration.sql              # ✓ Base schema: talent_profiles, job_postings, basic indexes
+supabase_migration_v2.sql           # ✓ Extended: connections, social signals
+supabase_migration_v3.sql           # ✓ NEW: hiring_forms, form_responses, form_notifications (One-Click Apply)
+supabase_migration_v4.sql           # ✓ NEW: Extended talent_profiles (photo_url, resume_url, linkedin_url, github_username, profession, state, experience_level, verify_github, verify_linkedin)
+```
+
+**Key Tables:**
+- `talent_profiles` — Worker profiles (id, name, niche, country, skills[], experience_years, bio, photo_url, resume_url, social links, verification badges)
+- `job_postings` — Job posts (id, title, org_id, description, required_skills[], location, match_score)
+- `hiring_forms` — Forms created by organizations (id, org_id, title, questions[], created_at)
+- `form_responses` — Candidate responses (id, form_id, talent_id, answers[], submitted_at)
+- `form_notifications` — Notifications for form recipients (id, form_id, recipient_count, status)
+- `connections` — Social connections between users (id, from_user_id, to_user_id, type, status)
 
 ---
 

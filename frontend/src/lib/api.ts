@@ -63,11 +63,23 @@ export const api = {
   getProfileMatches: (id: string) => request<{ matches: MatchResult[] }>('GET', `/profiles/${id}/matches`),
 
   // Talent platform — globe
-  getTalentGlobe: (params?: { niche?: string; role_type?: string; country_code?: string }) => {
+  getTalentGlobe: (params?: {
+    niche?: string
+    role_type?: string
+    country_code?: string
+    location?: string
+    profession?: string
+    skill?: string
+    experience_level?: 'junior' | 'mid' | 'senior'
+  }) => {
     const qs = new URLSearchParams()
     if (params?.niche) qs.set('niche', params.niche)
     if (params?.role_type) qs.set('role_type', params.role_type)
     if (params?.country_code) qs.set('country_code', params.country_code)
+    if (params?.location) qs.set('location', params.location)
+    if (params?.profession) qs.set('profession', params.profession)
+    if (params?.skill) qs.set('skill', params.skill)
+    if (params?.experience_level) qs.set('experience_level', params.experience_level)
     const q = qs.toString()
     return request<{ points: TalentPoint[]; total: number }>('GET', `/talent/globe${q ? '?' + q : ''}`)
   },
@@ -90,8 +102,21 @@ export const api = {
     upload<ExtractedProfile>('/talent/extract/cv', file),
 
   // Save profile
-  saveTalentProfile: (data: Partial<TalentPoint> & { github_username?: string }) =>
+  saveTalentProfile: (data: Omit<Partial<TalentPoint>, 'lat' | 'lng'> & {
+    lat?: number | null
+    lng?: number | null
+    github_username?: string
+    linkedin_url?: string
+    photo_url?: string
+    resume_url?: string
+    verify_github?: boolean
+    verify_linkedin?: boolean
+    profession?: string
+    state?: string
+  }) =>
     request<{ id: string; saved: boolean }>('POST', '/talent/save', data),
+  verifySocial: (data: { github_username?: string; linkedin_url?: string }) =>
+    request<{ github_verified: boolean; linkedin_verified: boolean; verified: boolean }>('POST', '/talent/verify-social', data),
   getMyTalentProfile: () => request<TalentPoint>('GET', '/talent/me'),
 
   // Jobs
@@ -104,4 +129,24 @@ export const api = {
     request<{ job: Partial<JobPosting>; points: TalentPoint[]; total: number; top_matches: TalentPoint[] }>(
       'GET', `/jobs/globe/${jobId}`
     ),
+
+  // Hiring Forms
+  createHiringForm: (data: {
+    job_title: string
+    job_description?: string
+    company?: string
+    questions: any[]
+    target_user_ids: string[]
+  }) => request<{ form_id: string; notified_count: number }>('POST', '/hiring/forms', data),
+  
+  listOrgForms: () => request<{ forms: any[] }>('GET', '/hiring/forms'),
+  
+  getFormDetail: (id: string) => request<any>('GET', `/hiring/forms/${id}`),
+  
+  submitFormResponse: (id: string, data: any) => 
+    request<{ response_id: string; submitted: boolean }>('POST', `/hiring/forms/${id}/respond`, data),
+  
+  getFormResponses: (id: string) => request<{ responses: any[] }>('GET', `/hiring/forms/${id}/responses`),
+
+  listNotifications: () => request<{ notifications: any[] }>('GET', '/hiring/notifications'),
 }

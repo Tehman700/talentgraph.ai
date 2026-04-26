@@ -63,7 +63,6 @@ export default function SkillsProfile() {
   }
 
   const durable = skillsProfile.skills.filter((s) => s.is_durable)
-  const transferable = skillsProfile.skills.filter((s) => s.category === 'transferable')
 
   return (
     <div style={{ background: '#f6f4ef', fontFamily: 'var(--font-mono)' }} className="min-h-screen pt-20 pb-32 px-6">
