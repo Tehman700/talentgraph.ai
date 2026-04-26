@@ -2,8 +2,23 @@ import { createClient } from '@supabase/supabase-js'
 
 const url  = import.meta.env.VITE_SUPABASE_URL  as string
 const key  = import.meta.env.VITE_SUPABASE_ANON_KEY as string
+const hasSupabaseConfig = Boolean(url && key)
 
-export const supabase = createClient(url, key)
+if (!hasSupabaseConfig) {
+  console.warn('Supabase env vars are missing. Auth features are disabled until VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set.')
+}
+
+const createNoopSupabase = () => ({
+  auth: {
+    getSession: async () => ({ data: { session: null } }),
+    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => undefined } } }),
+    signUp: async () => ({ data: null, error: new Error('Supabase is not configured') }),
+    signInWithPassword: async () => ({ data: null, error: new Error('Supabase is not configured') }),
+    signOut: async () => ({ error: null }),
+  },
+})
+
+export const supabase = hasSupabaseConfig ? createClient(url, key) : createNoopSupabase()
 
 export type AuthUser = {
   id: string

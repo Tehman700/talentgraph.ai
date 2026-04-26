@@ -41,7 +41,6 @@ export default function OnboardOrg() {
   const [city, setCity] = useState('')
   const [countryCode, setCountryCode] = useState('')
   const [description, setDescription] = useState('')
-  const [extractedSkills, setExtractedSkills] = useState<string[]>([])
 
   const mono = { fontFamily: 'var(--font-mono)' }
   const serif = { fontFamily: 'var(--font-serif)' }
@@ -62,7 +61,6 @@ export default function OnboardOrg() {
         lat: countryObj?.lat || null,
         lng: countryObj?.lng || null,
       })
-      setExtractedSkills(result.required_skills)
       setJobPosting({
         id: result.id,
         title: jobTitle,

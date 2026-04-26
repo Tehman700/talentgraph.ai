@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppStore } from '../store'
 import { api } from '../lib/api'
+import { parseDetectedLocation } from '../lib/location'
 import type { ExtractedProfile, LocationInfo } from '../types'
 import { TECH_NICHES, NICHE_COLORS } from '../types'
 
@@ -56,8 +57,6 @@ const COUNTRY_LIST = [
 
 const STEPS = ['Your Role', 'Experience', 'Location', 'Review']
 
-type InputMode = 'github' | 'bio'
-
 export default function OnboardTech() {
   const navigate = useNavigate()
   const { setExtractedProfile, setTalentNiche, setTalentRoleType, setLocation, setSavedTalentId } = useAppStore()
@@ -66,8 +65,8 @@ export default function OnboardTech() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [niche, setNiche] = useState('')
-  const [inputMode, setInputMode] = useState<InputMode>('github')
   const [githubInput, setGithubInput] = useState('')
+  const [linkedinInput, setLinkedinInput] = useState('')
   const [bioInput, setBioInput] = useState('')
   const [profile, setProfile] = useState<ExtractedProfile | null>(null)
   const [city, setCity] = useState('')
@@ -79,21 +78,28 @@ export default function OnboardTech() {
   const mono = { fontFamily: 'var(--font-mono)' }
   const serif = { fontFamily: 'var(--font-serif)' }
 
+  const normalizeGitHub = (input: string) =>
+    input
+      .trim()
+      .replace('https://github.com/', '')
+      .replace('http://github.com/', '')
+      .replace(/^@/, '')
+      .replace(/\/$/, '')
+
   const handleExtract = async () => {
     setLoading(true)
     setError('')
     try {
-      let result: ExtractedProfile
-      if (inputMode === 'github') {
-        result = await api.extractFromGitHub(githubInput.trim())
-      } else {
-        result = await api.extractFromBio(bioInput.trim())
-      }
+      const result = await api.synthesizeProfile({
+        role_type: 'tech',
+        github_username: normalizeGitHub(githubInput),
+        linkedin_url: linkedinInput.trim(),
+        bio: bioInput.trim(),
+      })
       setProfile(result)
-      if (result.detected_location && !city) {
-        const parts = result.detected_location.split(',')
-        if (parts[0]) setCity(parts[0].trim())
-      }
+      const detected = parseDetectedLocation(result.detected_location, COUNTRY_LIST)
+      if (!city && detected.city) setCity(detected.city)
+      if (!countryCode && detected.countryCode) handleCountryChange(detected.countryCode)
       setStep(2)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Extraction failed')
@@ -165,7 +171,13 @@ export default function OnboardTech() {
 
   const canProceed = () => {
     if (step === 0) return !!niche
-    if (step === 1) return inputMode === 'github' ? githubInput.trim().length > 0 : bioInput.trim().length >= 30
+    if (step === 1) {
+      return (
+        githubInput.trim().length > 0 ||
+        linkedinInput.trim().includes('linkedin.com/') ||
+        bioInput.trim().length >= 30
+      )
+    }
     if (step === 2) return !!countryCode
     return true
   }
@@ -231,36 +243,17 @@ export default function OnboardTech() {
               Your experience
             </h1>
             <p style={{ color: '#6b6458' }} className="text-sm mb-6">
-              Connect GitHub or paste your LinkedIn bio — our AI extracts your skills profile.
+              Add GitHub and LinkedIn profile links. If one is missing, you can still continue with available sources.
             </p>
 
-            {/* Mode toggle */}
-            <div className="flex gap-2 mb-6">
-              {(['github', 'bio'] as InputMode[]).map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setInputMode(m)}
-                  style={{
-                    padding: '8px 20px', borderRadius: 6, cursor: 'pointer', ...mono,
-                    background: inputMode === m ? '#0e0e12' : '#fff',
-                    color: inputMode === m ? '#f6f4ef' : '#6b6458',
-                    border: inputMode === m ? 'none' : '1.5px solid #d9d3c6',
-                    fontWeight: inputMode === m ? 600 : 400,
-                  }}
-                >
-                  {m === 'github' ? '◆ GitHub' : '≡ LinkedIn Bio'}
-                </button>
-              ))}
-            </div>
-
-            {inputMode === 'github' ? (
+            <div className="space-y-4">
               <div>
-                <label className="block text-xs uppercase tracking-widest mb-2" style={{ color: '#6b6458' }}>GitHub username</label>
+                <label className="block text-xs uppercase tracking-widest mb-2" style={{ color: '#6b6458' }}>GitHub username or profile URL</label>
                 <input
                   value={githubInput}
                   onChange={(e) => setGithubInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && canProceed() && handleExtract()}
-                  placeholder="e.g. torvalds"
+                  placeholder="e.g. torvalds or https://github.com/torvalds"
                   style={{
                     width: '100%', padding: '12px 14px',
                     border: '1.5px solid #d9d3c6', borderRadius: 8,
@@ -268,26 +261,43 @@ export default function OnboardTech() {
                   }}
                   className="focus:outline-none focus:border-blue"
                 />
-                <div className="text-xs mt-2" style={{ color: '#9a8f82' }}>We fetch your public repos, languages, and bio — no OAuth required.</div>
               </div>
-            ) : (
+
               <div>
-                <label className="block text-xs uppercase tracking-widest mb-2" style={{ color: '#6b6458' }}>Paste LinkedIn bio or professional summary</label>
+                <label className="block text-xs uppercase tracking-widest mb-2" style={{ color: '#6b6458' }}>LinkedIn profile URL</label>
+                <input
+                  value={linkedinInput}
+                  onChange={(e) => setLinkedinInput(e.target.value)}
+                  placeholder="https://www.linkedin.com/in/your-profile"
+                  style={{
+                    width: '100%', padding: '12px 14px',
+                    border: '1.5px solid #d9d3c6', borderRadius: 8,
+                    background: '#fff', ...mono, fontSize: 14, color: '#0e0e12',
+                  }}
+                  className="focus:outline-none focus:border-blue"
+                />
+                <div className="text-xs mt-2" style={{ color: '#9a8f82' }}>
+                  LinkedIn uses Playwright-based public fetch with fallback. If unavailable, add your summary below.
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs uppercase tracking-widest mb-2" style={{ color: '#6b6458' }}>Optional professional summary</label>
                 <textarea
                   value={bioInput}
                   onChange={(e) => setBioInput(e.target.value)}
-                  placeholder="Paste your LinkedIn 'About' section, resume summary, or any professional description..."
+                  placeholder="Paste your professional summary to improve extraction quality..."
                   style={{
-                    width: '100%', minHeight: 180, padding: '14px',
+                    width: '100%', minHeight: 140, padding: '14px',
                     border: '1.5px solid #d9d3c6', borderRadius: 8,
                     background: '#fff', ...mono, fontSize: 13, lineHeight: 1.6,
                     color: '#0e0e12', resize: 'vertical',
                   }}
                   className="focus:outline-none focus:border-blue"
                 />
-                <div className="text-xs mt-2" style={{ color: '#9a8f82' }}>{bioInput.length} chars · Minimum 30</div>
+                <div className="text-xs mt-2" style={{ color: '#9a8f82' }}>At least one input is required.</div>
               </div>
-            )}
+            </div>
 
             {error && <div style={{ color: '#b71c1c', fontSize: 12, marginTop: 8, background: '#fff3f3', padding: '10px 14px', borderRadius: 6 }}>{error}</div>}
 

@@ -64,7 +64,16 @@ async def post_job(payload: dict, user=Depends(get_optional_user), db=Depends(ge
             "niche": extracted.get("niche", ""),
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Save failed: {str(e)}")
+        msg = str(e)
+        if "PGRST205" in msg or "Could not find the table 'public.job_postings'" in msg:
+            raise HTTPException(
+                status_code=500,
+                detail=(
+                    "Save failed: missing Supabase table public.job_postings. "
+                    "Run backend/supabase_migration_v2.sql in Supabase SQL Editor, then retry."
+                ),
+            )
+        raise HTTPException(status_code=500, detail=f"Save failed: {msg}")
 
 
 @router.get("/globe/{job_id}")

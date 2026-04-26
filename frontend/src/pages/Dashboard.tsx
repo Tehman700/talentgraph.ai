@@ -17,6 +17,7 @@ export default function Dashboard() {
   const { authUser } = useAppStore()
   const navigate = useNavigate()
   const [profiles, setProfiles] = useState<SavedProfile[]>([])
+  const [notifications, setNotifications] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [error, setError] = useState('')
@@ -28,8 +29,12 @@ export default function Dashboard() {
 
   const load = async () => {
     try {
-      const { profiles } = await api.listProfiles()
+      const [{ profiles }, { notifications }] = await Promise.all([
+        api.listProfiles(),
+        api.listNotifications().catch(() => ({ notifications: [] }))
+      ])
       setProfiles(profiles)
+      setNotifications(notifications)
     } catch (e: any) {
       setError(e.message)
     } finally {
@@ -82,6 +87,42 @@ export default function Dashboard() {
         {error && (
           <div style={{ background: '#fff3f3', border: '1px solid #ffcdd2', borderRadius: 8, padding: '12px 16px', color: '#c62828', fontSize: 13, marginBottom: 24 }}>
             {error}
+          </div>
+        )}
+
+        {/* Notifications Section */}
+        {notifications.length > 0 && (
+          <div style={{ marginBottom: 40, background: '#fff', border: '1px solid #d9d3c6', borderRadius: 12, padding: 20 }}>
+            <div style={{ color: '#6b6458', fontSize: 11, letterSpacing: '0.2em', marginBottom: 15 }} className="uppercase">
+              🔔 Pending Applications
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {notifications.map((n) => (
+                <div key={n.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', border: '1px solid #f0ede8', borderRadius: 8, background: n.status === 'pending' ? '#fff9eb' : '#fff' }}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: '#0e0e12' }}>
+                      Apply to: {n.hiring_forms?.job_title}
+                    </div>
+                    <div style={{ fontSize: 12, color: '#6b6458' }}>
+                      From: {n.hiring_forms?.company}
+                    </div>
+                  </div>
+                  {n.status === 'responded' ? (
+                    <span style={{ fontSize: 11, color: '#2e7d32', fontStyle: 'italic', background: '#e8f5e9', padding: '4px 8px', borderRadius: 4 }}>
+                      Submitted
+                    </span>
+                  ) : (
+                    <button 
+                      onClick={() => navigate(`/apply/${n.form_id}`)}
+                      style={{ background: '#0e0e12', color: '#fff', border: 'none', padding: '6px 16px', borderRadius: 6, fontSize: 12, cursor: 'pointer' }}
+                    >
+                      Fill out form →
+                    </button>
+                  )
+                  }
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

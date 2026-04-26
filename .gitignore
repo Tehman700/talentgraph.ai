@@ -12,6 +12,8 @@ __pycache__/
 dist/
 build/
 .pytest_cache/
+**/__pycache__/
+**/*.py[cod]
 
 # Node
 node_modules/
@@ -37,3 +39,11 @@ desktop.ini
 *.tmp
 *.temp
 temp_*.py
+
+# Data exports (generated)
+ILO Dataset*.csv
+EMP_TEMP_SEX_AGE_ECO_NB_A-*.csv
+EAR_EMTA_SEX_ECO_CUR_NB_A-*.csv
+
+# Local tooling
+.claude/
