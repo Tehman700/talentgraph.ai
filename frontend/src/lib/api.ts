@@ -76,8 +76,16 @@ export const api = {
   // Talent extraction
   extractFromGitHub: (username: string) =>
     request<ExtractedProfile>('POST', '/talent/extract/github', { username }),
+  extractFromLinkedIn: (profile_url: string) =>
+    request<ExtractedProfile>('POST', '/talent/extract/linkedin', { profile_url }),
   extractFromBio: (bio: string) =>
     request<ExtractedProfile>('POST', '/talent/extract/bio', { bio }),
+  synthesizeProfile: (data: {
+    role_type?: 'tech' | 'non_tech'
+    github_username?: string
+    linkedin_url?: string
+    bio?: string
+  }) => request<ExtractedProfile>('POST', '/talent/extract/synthesize', data),
   extractFromCV: (file: File) =>
     upload<ExtractedProfile>('/talent/extract/cv', file),
 

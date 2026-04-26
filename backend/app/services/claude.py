@@ -11,7 +11,9 @@ MODEL = "gpt-4o-mini"
 def get_client() -> AsyncOpenAI:
     global _client
     if _client is None:
-        _client = AsyncOpenAI(api_key=settings.openai_api_key)
+        if not settings.llm_api_key:
+            raise HTTPException(status_code=500, detail="Missing OPENAI_API_KEY (or CLAUDE_API_KEY fallback) in backend .env")
+        _client = AsyncOpenAI(api_key=settings.llm_api_key)
     return _client
 
 

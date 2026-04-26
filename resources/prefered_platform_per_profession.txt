@@ -1,0 +1,100 @@
+1. Programmer / Developer
+GitHub
+OAuth Authentication: GitHub offers OAuth to log in via their platform and access user profile data (public repositories, activity, etc.).
+GitHub OAuth Docs
+Stack Overflow
+OAuth Authentication: Allows login via Stack Exchange network (includes Stack Overflow, Ask Ubuntu, etc.).
+Stack Exchange OAuth Docs
+GitLab
+OAuth Authentication: Similar to GitHub, GitLab provides OAuth integration to verify users and fetch data.
+GitLab OAuth Docs
+Bitbucket
+OAuth Authentication: Allows OAuth login to fetch public repositories and user info.
+Bitbucket OAuth Docs
+2. Data Scientist / Analyst
+Kaggle
+OAuth Authentication: Kaggle supports OAuth login and allows access to user profiles, datasets, and competitions.
+Kaggle OAuth Docs
+GitHub
+OAuth Authentication: Also useful for data scientists for accessing code repositories, datasets, and notebooks.
+GitHub OAuth Docs
+Google Colab
+OAuth Authentication: Allows users to sign in with Google OAuth, saving notebooks and fetching datasets.
+Google OAuth Docs
+3. Designer
+Behance
+OAuth Authentication: Behance, a platform for creative professionals, supports OAuth login for accessing portfolios.
+Behance OAuth Docs
+Dribbble
+OAuth Authentication: Allows users to log in via OAuth to access profile and shots (design work).
+Dribbble OAuth Docs
+Figma
+OAuth Authentication: Figma enables OAuth login for team and file management.
+Figma OAuth Docs
+4. Researcher / Academic
+Google Scholar
+OAuth Authentication: Google provides OAuth authentication for Scholar, although limited, it can be used to verify Google accounts.
+Google OAuth Docs
+ResearchGate
+OAuth Authentication: Offers OAuth login to connect with researchers and access their publications.
+ResearchGate OAuth Docs
+Academia.edu
+OAuth Authentication: Supports OAuth login for users to manage their research profile.
+Academia.edu OAuth Docs
+5. Writer / Content Creator
+Medium
+OAuth Authentication: Medium supports OAuth login, which can allow access to user content and publishing history.
+Medium OAuth Docs
+Substack
+OAuth Authentication: Substack allows OAuth login for newsletter creation and user verification.
+Substack OAuth Docs
+Wattpad
+OAuth Authentication: Users can sign in via OAuth and access their published stories and reader profiles.
+Wattpad OAuth Docs
+6. Entrepreneur / Startup
+AngelList (Wellfound)
+OAuth Authentication: Allows login with OAuth and provides access to startup information, job listings, and investor profiles.
+AngelList OAuth Docs
+Crunchbase
+OAuth Authentication: Crunchbase offers OAuth for accessing company profiles, funding rounds, and news.
+Crunchbase OAuth Docs
+Product Hunt
+OAuth Authentication: OAuth login allows users to create and track new products, startups, and product reviews.
+Product Hunt OAuth Docs
+7. Photographer / Videographer
+500px
+OAuth Authentication: 500px provides OAuth authentication to access user portfolios and photos.
+500px OAuth Docs
+Flickr
+OAuth Authentication: Allows photographers to authenticate via OAuth and access their uploaded images and metadata.
+Flickr OAuth Docs
+Vimeo
+OAuth Authentication: Vimeo supports OAuth to verify users and access their video uploads and metadata.
+Vimeo OAuth Docs
+8. Musician / Composer
+SoundCloud
+OAuth Authentication: SoundCloud provides OAuth login for accessing user tracks, playlists, and profile data.
+SoundCloud OAuth Docs
+Bandcamp
+OAuth Authentication: Bandcamp supports OAuth for musicians to manage their artist profile and track sales.
+Bandcamp OAuth Docs
+Spotify
+OAuth Authentication: Spotify allows OAuth login for managing playlists, listening history, and personal music data.
+Spotify OAuth Docs
+9. Teacher / Educator
+Coursera
+OAuth Authentication: Coursera offers OAuth authentication for students and instructors to manage their profiles, courses, and certificates.
+Coursera OAuth Docs
+Khan Academy
+OAuth Authentication: Khan Academy supports OAuth login, allowing users to track progress, courses, and achievements.
+Khan Academy OAuth Docs
+Duolingo
+OAuth Authentication: Duolingo allows OAuth login to track language learning progress and access course content.
+Duolingo OAuth Docs
+10. Cybersecurity Specialist
+Hack The Box
+OAuth Authentication: Allows users to log in via OAuth to access challenges and community data.
+Hack The Box OAuth Docs
+TryHackMe
+OAuth Authentication: Provides OAuth login for accessing cybersecurity challenges and learning modules.
+TryHackMe OAuth Docs

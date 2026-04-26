@@ -3,7 +3,13 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File
 from ..auth import get_optional_user
 from ..database import get_db
-from ..services.talent_extractor import extract_from_github, extract_from_bio, extract_from_cv
+from ..services.talent_extractor import (
+    extract_from_github,
+    extract_from_bio,
+    extract_from_cv,
+    extract_from_linkedin,
+    synthesize_profile,
+)
 
 router = APIRouter(prefix="/api/talent", tags=["talent"])
 
@@ -103,6 +109,19 @@ async def extract_bio(payload: dict):
     return await extract_from_bio(bio_text)
 
 
+@router.post("/extract/linkedin")
+async def extract_linkedin(payload: dict):
+    profile_url = payload.get("profile_url", "").strip()
+    if not profile_url:
+        raise HTTPException(status_code=422, detail="LinkedIn profile URL required")
+    return await extract_from_linkedin(profile_url)
+
+
+@router.post("/extract/synthesize")
+async def extract_synthesize(payload: dict):
+    return await synthesize_profile(payload)
+
+
 @router.post("/extract/cv")
 async def extract_cv_endpoint(file: UploadFile = File(...)):
     fname = file.filename or ""
@@ -138,7 +157,16 @@ async def save_talent(payload: dict, user=Depends(get_optional_user), db=Depends
         result = db.table("talent_profiles").insert(row).execute()
         return {"id": result.data[0]["id"], "saved": True}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Save failed: {str(e)}")
+        msg = str(e)
+        if "PGRST205" in msg or "Could not find the table 'public.talent_profiles'" in msg:
+            raise HTTPException(
+                status_code=500,
+                detail=(
+                    "Save failed: missing Supabase table public.talent_profiles. "
+                    "Run backend/supabase_migration_v2.sql in Supabase SQL Editor, then retry."
+                ),
+            )
+        raise HTTPException(status_code=500, detail=f"Save failed: {msg}")
 
 
 @router.get("/me")

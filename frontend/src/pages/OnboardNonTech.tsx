@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppStore } from '../store'
 import { api } from '../lib/api'
+import { parseDetectedLocation } from '../lib/location'
 import type { ExtractedProfile, LocationInfo } from '../types'
 import { NON_TECH_NICHES, NICHE_COLORS } from '../types'
 
@@ -70,10 +71,9 @@ export default function OnboardNonTech() {
         result = await api.extractFromBio(bioInput.trim())
       }
       setProfile(result)
-      if (result.detected_location && !city) {
-        const parts = result.detected_location.split(',')
-        if (parts[0]) setCity(parts[0].trim())
-      }
+      const detected = parseDetectedLocation(result.detected_location, COUNTRY_LIST)
+      if (!city && detected.city) setCity(detected.city)
+      if (!countryCode && detected.countryCode) handleCountryChange(detected.countryCode)
       setStep(2)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Extraction failed')

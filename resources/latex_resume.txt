@@ -1,0 +1,106 @@
+```latex
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[left=0.75in,right=0.75in,top=0.8in,bottom=0.8in]{geometry}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+\setlength{\parindent}{0pt}
+\setlist[itemize]{noitemsep, topsep=2pt}
+
+\pagenumbering{gobble}
+
+\begin{document}
+
+%====================
+% NAME + CONTACT
+%====================
+{\LARGE \textbf{YOUR FULL NAME}} \\
+\vspace{4pt}
+Phone: +XX-XXXXXXXXXX \\
+Email: your@email.com \\
+LinkedIn: linkedin.com/in/yourprofile \\
+GitHub/Portfolio: github.com/yourusername
+
+\vspace{10pt}
+
+%====================
+% PROFESSIONAL SUMMARY (REPLACE)
+%====================
+\textbf{PROFESSIONAL SUMMARY} \\
+2–3 lines with job-relevant keywords (e.g., "Python Developer", "DevOps", "React", "AWS").
+
+\vspace{8pt}
+
+%====================
+% SKILLS (REPLACE)
+%====================
+\textbf{SKILLS} \\
+\textbf{Languages:} X, Y, Z \\
+\textbf{Frameworks/Tools:} A, B, C \\
+\textbf{Technologies:} Cloud, Databases, DevOps tools
+
+\vspace{8pt}
+
+%====================
+% EXPERIENCE (REPLACE)
+%====================
+\textbf{PROFESSIONAL EXPERIENCE} \\
+
+\textbf{Job Title} \\
+Company Name \\
+Start Date -- End Date \\
+\begin{itemize}
+    \item Action verb + task + measurable result (e.g., "Developed REST APIs using FastAPI, improving response time by 30\%")
+    \item Use keywords from job description
+    \item Focus on impact, not duties
+\end{itemize}
+
+\vspace{6pt}
+
+\textbf{Job Title} \\
+Company Name \\
+Start Date -- End Date \\
+\begin{itemize}
+    \item Achievement
+    \item Contribution
+\end{itemize}
+
+\vspace{8pt}
+
+%====================
+% PROJECTS (REPLACE)
+%====================
+\textbf{PROJECTS} \\
+
+\textbf{Project Name} \\
+\begin{itemize}
+    \item Built using [Tech Stack]
+    \item Key feature or achievement
+    \item Include metrics or results if possible
+\end{itemize}
+
+\vspace{8pt}
+
+%====================
+% EDUCATION (REPLACE)
+%====================
+\textbf{EDUCATION} \\
+Degree Name \\
+University Name \\
+Year -- Year \\
+(Optional: GPA)
+
+\vspace{8pt}
+
+%====================
+% CERTIFICATIONS / ADDITIONAL (OPTIONAL)
+%====================
+\textbf{CERTIFICATIONS / ADDITIONAL} \\
+\begin{itemize}
+    \item Certification Name
+    \item Relevant achievement
+\end{itemize}
+
+\end{document}
+```

@@ -136,8 +136,14 @@ export interface ExtractedProfile {
   bio: string
   detected_location: string
   github_username?: string
+  linkedin_url?: string
   raw_github_location?: string
   education_level?: EducationLevel
+  sources?: {
+    github?: boolean
+    linkedin?: boolean
+    bio?: boolean
+  }
 }
 
 export interface JobPosting {

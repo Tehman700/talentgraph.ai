@@ -95,7 +95,6 @@ export function TalentGlobe({ size = 520, showLegend = true, points, mode = 'exp
         width={size}
         height={size}
         backgroundColor="rgba(0,0,0,0)"
-        globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
         atmosphereColor="#1710E6"
         atmosphereAltitude={0.18}
         pointsData={displayPoints}
